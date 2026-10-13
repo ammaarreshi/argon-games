@@ -1,0 +1,433 @@
+{
+  "project": "Argon Airspace (Three.js Orthographic Engine)",
+  "generators": {
+    "visuals": "scripts/generate_visual_assets.py",
+    "audio": "scripts/generate_audio_assets.py"
+  },
+  "models": {
+    "image": "models/gempix-2-flash-lite-png",
+    "music": "models/lyria-3-mp3",
+    "voice_tts": "models/gemini-v4s-rev26-tts"
+  },
+  "textures": [
+    {
+      "file": "assets/textures/hostess_alpine.jpg",
+      "size_bytes": 71810
+    },
+    {
+      "file": "assets/textures/hostess_alpine.png",
+      "size_bytes": 444030
+    },
+    {
+      "file": "assets/textures/hostess_hawaii.jpg",
+      "size_bytes": 69449
+    },
+    {
+      "file": "assets/textures/hostess_hawaii.png",
+      "size_bytes": 431653
+    },
+    {
+      "file": "assets/textures/hostess_nurse.jpg",
+      "size_bytes": 59219
+    },
+    {
+      "file": "assets/textures/hostess_nurse.png",
+      "size_bytes": 404321
+    },
+    {
+      "file": "assets/textures/hostess_wendy.jpg",
+      "size_bytes": 67264
+    },
+    {
+      "file": "assets/textures/hostess_wendy.png",
+      "size_bytes": 446417
+    },
+    {
+      "file": "assets/textures/map_alpine_winter.jpg",
+      "size_bytes": 172501
+    },
+    {
+      "file": "assets/textures/map_alpine_winter.png",
+      "size_bytes": 1480594
+    },
+    {
+      "file": "assets/textures/map_classic_outback.jpg",
+      "size_bytes": 242863
+    },
+    {
+      "file": "assets/textures/map_classic_outback.png",
+      "size_bytes": 1690255
+    },
+    {
+      "file": "assets/textures/map_tropical_island.jpg",
+      "size_bytes": 187226
+    },
+    {
+      "file": "assets/textures/map_tropical_island.png",
+      "size_bytes": 1458741
+    },
+    {
+      "file": "assets/textures/plane_heli_blue.png",
+      "size_bytes": 21868
+    },
+    {
+      "file": "assets/textures/plane_jet_red.png",
+      "size_bytes": 29450
+    },
+    {
+      "file": "assets/textures/plane_prop_blue.png",
+      "size_bytes": 24385
+    },
+    {
+      "file": "assets/textures/plane_prop_yellow.png",
+      "size_bytes": 22135
+    },
+    {
+      "file": "assets/textures/plane_seaplane_green.png",
+      "size_bytes": 26238
+    },
+    {
+      "file": "assets/textures/prop_blur.png",
+      "size_bytes": 25726
+    },
+    {
+      "file": "assets/textures/rotor_blur.png",
+      "size_bytes": 33974
+    },
+    {
+      "file": "assets/textures/ui_cork_badges.jpg",
+      "size_bytes": 56184
+    },
+    {
+      "file": "assets/textures/ui_cork_badges.png",
+      "size_bytes": 455687
+    },
+    {
+      "file": "assets/textures/ui_parchment_clipboard.jpg",
+      "size_bytes": 245769
+    },
+    {
+      "file": "assets/textures/ui_parchment_clipboard.png",
+      "size_bytes": 1765379
+    },
+    {
+      "file": "assets/textures/ui_wood_tabletop.jpg",
+      "size_bytes": 273724
+    },
+    {
+      "file": "assets/textures/ui_wood_tabletop.png",
+      "size_bytes": 1766760
+    },
+    {
+      "file": "assets/textures/windsock_orange.png",
+      "size_bytes": 21824
+    }
+  ],
+  "atlases": [
+    {
+      "file": "assets/textures/aircraft_atlas.json",
+      "size_bytes": 2853
+    },
+    {
+      "file": "assets/textures/aircraft_atlas.png",
+      "size_bytes": 226778
+    }
+  ],
+  "music": [
+    {
+      "id": "main_menu_bossa",
+      "prompt": "1950s breezy sunny airport lounge bossa nova jazz instrumental, warm vibraphone lead melody, acoustic upright bass, soft brushed snare drums, sophisticated mid-century Argon Airways travel lounge vibe",
+      "mp3_file": "assets/audio/music/main_menu_bossa.mp3",
+      "ogg_file": "assets/audio/music/main_menu_bossa.ogg",
+      "mp3_size_bytes": 744657,
+      "ogg_size_bytes": 467376,
+      "duration_sec": 30.772
+    },
+    {
+      "id": "inflight_lounge_relaxed",
+      "prompt": "Upbeat 1950s mid-century easy-listening airport lounge jazz instrumental, warm muted trumpets, walking upright bassline, playful jazz flute melody, soft big-band brass swells, cheerful retro aviation soundtrack",
+      "mp3_file": "assets/audio/music/inflight_lounge_relaxed.mp3",
+      "ogg_file": "assets/audio/music/inflight_lounge_relaxed.ogg",
+      "mp3_size_bytes": 744657,
+      "ogg_size_bytes": 463565,
+      "duration_sec": 30.772
+    },
+    {
+      "id": "inflight_bigband_swing",
+      "prompt": "Energetic uptempo 1950s big-band swing jazz instrumental, driving brass section riffs, fast walking double bass, crisp swing ride cymbals, exciting high-traffic airport control tower energy",
+      "mp3_file": "assets/audio/music/inflight_bigband_swing.mp3",
+      "ogg_file": "assets/audio/music/inflight_bigband_swing.ogg",
+      "mp3_size_bytes": 744657,
+      "ogg_size_bytes": 482425,
+      "duration_sec": 30.772
+    },
+    {
+      "id": "victory_stinger",
+      "prompt": "Short celebratory 1950s big-band brass fanfare jingle, bright triumphant trumpets, vibraphone glissando, classic mid-century Hollywood victory cadence",
+      "mp3_file": "assets/audio/music/victory_stinger.mp3",
+      "ogg_file": "assets/audio/music/victory_stinger.ogg",
+      "mp3_size_bytes": 719580,
+      "ogg_size_bytes": 494423,
+      "duration_sec": 29.727
+    }
+  ],
+  "voice": [
+    {
+      "id": "wendy_welcome",
+      "category": "stewardess",
+      "voice": "Aoede",
+      "style": "warm, crisp, charming 1950s transatlantic Argon Airways airline stewardess announcement over cabin PA",
+      "text": "Welcome aboard, guest! Clear skies ahead at the airfield.",
+      "radio_filter": false,
+      "wav_file": "assets/audio/voice/wendy_welcome.wav",
+      "mp3_file": "assets/audio/voice/wendy_welcome.mp3",
+      "ogg_file": "assets/audio/voice/wendy_welcome.ogg",
+      "wav_size_bytes": 195884,
+      "mp3_size_bytes": 66477,
+      "ogg_size_bytes": 30518,
+      "duration_sec": 4.08
+    },
+    {
+      "id": "wendy_seatbelts",
+      "category": "stewardess",
+      "voice": "Aoede",
+      "style": "warm, crisp, charming 1950s transatlantic Argon Airways airline stewardess announcement over cabin PA",
+      "text": "Fasten your seatbelts, things are getting busy in the pattern!",
+      "radio_filter": false,
+      "wav_file": "assets/audio/voice/wendy_seatbelts.wav",
+      "mp3_file": "assets/audio/voice/wendy_seatbelts.mp3",
+      "ogg_file": "assets/audio/voice/wendy_seatbelts.ogg",
+      "wav_size_bytes": 199724,
+      "mp3_size_bytes": 68013,
+      "ogg_size_bytes": 32301,
+      "duration_sec": 4.16
+    },
+    {
+      "id": "wendy_beverage",
+      "category": "stewardess",
+      "voice": "Aoede",
+      "style": "warm, crisp, charming 1950s transatlantic Argon Airways airline stewardess announcement over cabin PA",
+      "text": "Please enjoy this refreshing beverage while you guide our flights!",
+      "radio_filter": false,
+      "wav_file": "assets/audio/voice/wendy_beverage.wav",
+      "mp3_file": "assets/audio/voice/wendy_beverage.mp3",
+      "ogg_file": "assets/audio/voice/wendy_beverage.ogg",
+      "wav_size_bytes": 230444,
+      "mp3_size_bytes": 77997,
+      "ogg_size_bytes": 35095,
+      "duration_sec": 4.8
+    },
+    {
+      "id": "wendy_look_out",
+      "category": "stewardess",
+      "voice": "Aoede",
+      "style": "warm, crisp, charming 1950s transatlantic Argon Airways airline stewardess announcement over cabin PA",
+      "text": "Crikey, look out! Keep those aircraft separated!",
+      "radio_filter": false,
+      "wav_file": "assets/audio/voice/wendy_look_out.wav",
+      "mp3_file": "assets/audio/voice/wendy_look_out.mp3",
+      "ogg_file": "assets/audio/voice/wendy_look_out.ogg",
+      "wav_size_bytes": 217004,
+      "mp3_size_bytes": 73773,
+      "ogg_size_bytes": 34523,
+      "duration_sec": 4.52
+    },
+    {
+      "id": "wendy_personal_best",
+      "category": "stewardess",
+      "voice": "Aoede",
+      "style": "warm, crisp, charming 1950s transatlantic Argon Airways airline stewardess announcement over cabin PA",
+      "text": "New personal best, congratulations Captain!",
+      "radio_filter": false,
+      "wav_file": "assets/audio/voice/wendy_personal_best.wav",
+      "mp3_file": "assets/audio/voice/wendy_personal_best.mp3",
+      "ogg_file": "assets/audio/voice/wendy_personal_best.ogg",
+      "wav_size_bytes": 192044,
+      "mp3_size_bytes": 65325,
+      "ogg_size_bytes": 29907,
+      "duration_sec": 4.0
+    },
+    {
+      "id": "atc_cleared_29",
+      "category": "atc_radio",
+      "voice": "Orus",
+      "style": "crisp, professional 1950s air traffic control pilot over aviation VHF radio",
+      "text": "Tower, Clipper Heavy cleared to land, runway two-niner.",
+      "radio_filter": true,
+      "wav_file": "assets/audio/voice/atc_cleared_29.wav",
+      "mp3_file": "assets/audio/voice/atc_cleared_29.mp3",
+      "ogg_file": "assets/audio/voice/atc_cleared_29.ogg",
+      "wav_size_bytes": 218828,
+      "mp3_size_bytes": 74157,
+      "ogg_size_bytes": 33474,
+      "duration_sec": 4.558
+    },
+    {
+      "id": "atc_helipad_clear",
+      "category": "atc_radio",
+      "voice": "Orus",
+      "style": "crisp, professional 1950s air traffic control pilot over aviation VHF radio",
+      "text": "Rescue Chopper One, helipad is clear for approach.",
+      "radio_filter": true,
+      "wav_file": "assets/audio/voice/atc_helipad_clear.wav",
+      "mp3_file": "assets/audio/voice/atc_helipad_clear.mp3",
+      "ogg_file": "assets/audio/voice/atc_helipad_clear.ogg",
+      "wav_size_bytes": 203468,
+      "mp3_size_bytes": 69165,
+      "ogg_size_bytes": 31461,
+      "duration_sec": 4.238
+    },
+    {
+      "id": "atc_go_around",
+      "category": "atc_radio",
+      "voice": "Orus",
+      "style": "crisp, professional 1950s air traffic control pilot over aviation VHF radio",
+      "text": "Go around! Traffic conflict on final approach!",
+      "radio_filter": true,
+      "wav_file": "assets/audio/voice/atc_go_around.wav",
+      "mp3_file": "assets/audio/voice/atc_go_around.mp3",
+      "ogg_file": "assets/audio/voice/atc_go_around.ogg",
+      "wav_size_bytes": 176588,
+      "mp3_size_bytes": 60333,
+      "ogg_size_bytes": 27542,
+      "duration_sec": 3.678
+    },
+    {
+      "id": "praise_you_bewdy",
+      "category": "aussie_praise",
+      "voice": "Puck",
+      "style": "enthusiastic, cheerful Australian bush pilot celebrating a great landing",
+      "text": "You bewdy!",
+      "radio_filter": false,
+      "wav_file": "assets/audio/voice/praise_you_bewdy.wav",
+      "mp3_file": "assets/audio/voice/praise_you_bewdy.mp3",
+      "ogg_file": "assets/audio/voice/praise_you_bewdy.ogg",
+      "wav_size_bytes": 94124,
+      "mp3_size_bytes": 32685,
+      "ogg_size_bytes": 15550,
+      "duration_sec": 1.96
+    },
+    {
+      "id": "praise_onya_mate",
+      "category": "aussie_praise",
+      "voice": "Puck",
+      "style": "enthusiastic, cheerful Australian bush pilot celebrating a great landing",
+      "text": "Onya mate!",
+      "radio_filter": false,
+      "wav_file": "assets/audio/voice/praise_onya_mate.wav",
+      "mp3_file": "assets/audio/voice/praise_onya_mate.mp3",
+      "ogg_file": "assets/audio/voice/praise_onya_mate.ogg",
+      "wav_size_bytes": 67244,
+      "mp3_size_bytes": 23853,
+      "ogg_size_bytes": 12538,
+      "duration_sec": 1.4
+    },
+    {
+      "id": "praise_no_worries",
+      "category": "aussie_praise",
+      "voice": "Puck",
+      "style": "enthusiastic, cheerful Australian bush pilot celebrating a great landing",
+      "text": "No worries!",
+      "radio_filter": false,
+      "wav_file": "assets/audio/voice/praise_no_worries.wav",
+      "mp3_file": "assets/audio/voice/praise_no_worries.mp3",
+      "ogg_file": "assets/audio/voice/praise_no_worries.ogg",
+      "wav_size_bytes": 74924,
+      "mp3_size_bytes": 26157,
+      "ogg_size_bytes": 13441,
+      "duration_sec": 1.56
+    },
+    {
+      "id": "praise_fair_dinkum",
+      "category": "aussie_praise",
+      "voice": "Puck",
+      "style": "enthusiastic, cheerful Australian bush pilot celebrating a great landing",
+      "text": "Fair dinkum!",
+      "radio_filter": false,
+      "wav_file": "assets/audio/voice/praise_fair_dinkum.wav",
+      "mp3_file": "assets/audio/voice/praise_fair_dinkum.mp3",
+      "ogg_file": "assets/audio/voice/praise_fair_dinkum.ogg",
+      "wav_size_bytes": 103724,
+      "mp3_size_bytes": 35757,
+      "ogg_size_bytes": 17805,
+      "duration_sec": 2.16
+    },
+    {
+      "id": "praise_ripper",
+      "category": "aussie_praise",
+      "voice": "Puck",
+      "style": "enthusiastic, cheerful Australian bush pilot celebrating a great landing",
+      "text": "Ripper landing!",
+      "radio_filter": false,
+      "wav_file": "assets/audio/voice/praise_ripper.wav",
+      "mp3_file": "assets/audio/voice/praise_ripper.mp3",
+      "ogg_file": "assets/audio/voice/praise_ripper.ogg",
+      "wav_size_bytes": 78764,
+      "mp3_size_bytes": 27693,
+      "ogg_size_bytes": 14807,
+      "duration_sec": 1.64
+    }
+  ],
+  "sfx": [
+    {
+      "id": "bell_ding",
+      "wav_file": "assets/audio/sfx/bell_ding.wav",
+      "mp3_file": "assets/audio/sfx/bell_ding.mp3",
+      "ogg_file": "assets/audio/sfx/bell_ding.ogg",
+      "wav_size_bytes": 40844,
+      "mp3_size_bytes": 15021,
+      "ogg_size_bytes": 5425,
+      "duration_sec": 0.85
+    },
+    {
+      "id": "proximity_alarm",
+      "wav_file": "assets/audio/sfx/proximity_alarm.wav",
+      "mp3_file": "assets/audio/sfx/proximity_alarm.mp3",
+      "ogg_file": "assets/audio/sfx/proximity_alarm.ogg",
+      "wav_size_bytes": 32684,
+      "mp3_size_bytes": 12333,
+      "ogg_size_bytes": 6377,
+      "duration_sec": 0.68
+    },
+    {
+      "id": "crash_explosion",
+      "wav_file": "assets/audio/sfx/crash_explosion.wav",
+      "mp3_file": "assets/audio/sfx/crash_explosion.mp3",
+      "ogg_file": "assets/audio/sfx/crash_explosion.ogg",
+      "wav_size_bytes": 60044,
+      "mp3_size_bytes": 21549,
+      "ogg_size_bytes": 11143,
+      "duration_sec": 1.25
+    },
+    {
+      "id": "path_draw_tick",
+      "wav_file": "assets/audio/sfx/path_draw_tick.wav",
+      "mp3_file": "assets/audio/sfx/path_draw_tick.mp3",
+      "ogg_file": "assets/audio/sfx/path_draw_tick.ogg",
+      "wav_size_bytes": 2924,
+      "mp3_size_bytes": 2349,
+      "ogg_size_bytes": 3946,
+      "duration_sec": 0.06
+    },
+    {
+      "id": "route_lock",
+      "wav_file": "assets/audio/sfx/route_lock.wav",
+      "mp3_file": "assets/audio/sfx/route_lock.mp3",
+      "ogg_file": "assets/audio/sfx/route_lock.ogg",
+      "wav_size_bytes": 20204,
+      "mp3_size_bytes": 8109,
+      "ogg_size_bytes": 4743,
+      "duration_sec": 0.42
+    },
+    {
+      "id": "stamp_thud",
+      "wav_file": "assets/audio/sfx/stamp_thud.wav",
+      "mp3_file": "assets/audio/sfx/stamp_thud.mp3",
+      "ogg_file": "assets/audio/sfx/stamp_thud.ogg",
+      "wav_size_bytes": 18284,
+      "mp3_size_bytes": 7341,
+      "ogg_size_bytes": 4801,
+      "duration_sec": 0.38
+    }
+  ]
+}

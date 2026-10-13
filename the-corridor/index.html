@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="data:," />
+  <title>The Corridor — Argon Psychological Horror Engine</title>
+  <script>
+    // Apply ?clean=1 and ?debug=1 / ?hud=1 immediately before first paint
+    (function () {
+      try {
+        var params = new URLSearchParams(window.location.search);
+        var isClean =
+          params.get('clean') === '1' ||
+          params.get('clean') === 'true' ||
+          params.get('hud') === '0';
+        var isDebugHud =
+          params.get('debug') === '1' ||
+          params.get('debug') === 'true' ||
+          params.get('hud') === '1' ||
+          params.get('hud') === 'true';
+        if (isClean) {
+          document.documentElement.classList.add('clean-mode');
+        }
+        if (isDebugHud) {
+          document.documentElement.classList.add('debug-hud-visible');
+        }
+        window.setCleanMode = function (clean) {
+          var flag = Boolean(clean);
+          document.documentElement.classList.toggle('clean-mode', flag);
+          if (document.body) {
+            document.body.classList.toggle('clean-mode', flag);
+          }
+          var uiRoot = document.getElementById('pt-ui-root');
+          if (uiRoot) {
+            uiRoot.style.display = flag ? 'none' : '';
+          }
+          return flag;
+        };
+      } catch (e) {}
+    })();
+  </script>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "./assets/vendor/three.module.js",
+        "three/addons/": "./assets/vendor/"
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <script>
+    if (document.documentElement.classList.contains('clean-mode')) {
+      document.body.classList.add('clean-mode');
+    }
+    if (document.documentElement.classList.contains('debug-hud-visible')) {
+      document.body.classList.add('debug-hud-visible');
+    }
+  </script>
+
+  <!-- 3D WebGL Viewport Container -->
+  <div id="viewport" class="pt-viewport">
+    <canvas id="pt-canvas"></canvas>
+  </div>
+
+  <!-- Diegetic The Corridor (Argon Studio / Corridor Engine) Viewport UI -->
+  <div id="pt-ui-root" class="pt-hud-layer">
+    <!-- 1. Center Minimalist The Corridor Focus Reticle & Contextual Inspect Prompt -->
+    <div id="pt-reticle-container" class="pt-reticle-container" aria-live="polite">
+      <div id="pt-reticle-dot" class="pt-reticle-dot">
+        <svg class="pt-reticle-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M1.5 12s4-7.5 10.5-7.5S22.5 12 22.5 12s-4 7.5-10.5 7.5S1.5 12 1.5 12z" />
+          <circle cx="12" cy="12" r="3.2" />
+        </svg>
+      </div>
+      <div id="pt-reticle-prompt" class="pt-reticle-prompt hidden">
+        <span class="pt-prompt-key">[E]</span>
+        <span id="pt-reticle-prompt-text">Inspect Radio — "204863"</span>
+      </div>
+    </div>
+
+    <!-- 2. Atmospheric Diegetic The Corridor Subtitles (Bottom-Center) -->
+    <div id="pt-subtitle-bar" class="pt-subtitle-bar hidden" role="status" aria-live="assertive">
+      <span id="pt-subtitle-speaker" class="pt-subtitle-speaker">[AM RADIO]</span>
+      <span id="pt-subtitle-text" class="pt-subtitle-text">"Look behind you. I said... look behind you."</span>
+    </div>
+
+    <!-- 3. Subtle Diegetic Corner Control Whisper (Bottom-Right, fades to 0.18 on movement) -->
+    <div id="pt-diegetic-hint" class="pt-diegetic-hint" aria-hidden="true">
+      WASD MOVE &nbsp;•&nbsp; MOUSE LOOK &nbsp;•&nbsp; [F] FLASHLIGHT &nbsp;•&nbsp; [E] INSPECT &nbsp;•&nbsp; [Z] ZOOM
+    </div>
+
+    <!-- 4. Diegetic Torn Photograph Counter Whisper (Top-Right, flashes 4s on fragment recovery) -->
+    <div id="pt-photo-whisper" class="pt-photo-whisper hidden" aria-live="polite">
+      <span id="pt-photo-whisper-text">FRAGMENT 2 / 6 RECOVERED [TAB]</span>
+    </div>
+
+    <!-- 5. Interactive Clue & 6-Piece Torn Photograph Inspection Overlay ([Tab] or [P]) -->
+    <aside id="pt-photo-drawer" class="pt-photo-drawer hidden" aria-label="Torn Family Photograph Inspection">
+      <div class="pt-drawer-header">
+        <div>
+          <div class="pt-drawer-kicker">EVIDENCE FILE // 204863</div>
+          <h2 class="pt-drawer-title">Torn Family Photograph (1977)</h2>
+        </div>
+        <button id="btn-close-drawer" type="button" class="pt-drawer-close" title="Close (Tab / P / Esc)">✕</button>
+      </div>
+
+      <div class="pt-portrait-assembly-frame">
+        <div id="pt-portrait-grid" class="pt-portrait-grid"></div>
+        <div class="pt-riddle-code-strip">
+          <span class="pt-riddle-label">BROADCAST CIPHER:</span>
+          <span id="pt-riddle-digits" class="pt-riddle-digits">2 - 0 - ? - ? - ? - ?</span>
+        </div>
+      </div>
+
+      <div id="pt-active-clue-card" class="pt-active-clue-card">
+        <div id="pt-active-clue-title" class="pt-active-clue-title">Piece #2 (Corner Radio &amp; 23:59 Clock)</div>
+        <p id="pt-active-clue-caption" class="pt-active-clue-caption">"Do not trust the tap water. 2-0-4-8-6-3."</p>
+      </div>
+
+      <ul id="pt-clue-list" class="pt-clue-list"></ul>
+
+      <div class="pt-drawer-diegetic-footer">
+        SEARCH THE CORRIDOR [E] TO RECOVER TORN FRAGMENTS &nbsp;•&nbsp; [TAB / P] CLOSE
+      </div>
+
+      <div class="pt-drawer-actions">
+        <button id="btn-collect-clue" type="button" class="pt-drawer-btn">
+          + Collect Next Fragment
+        </button>
+        <button id="btn-solve-riddle" type="button" class="pt-drawer-btn pt-drawer-btn-crimson">
+          ☎ Solve 204863 Riddle
+        </button>
+      </div>
+    </aside>
+
+    <!-- 6. Developer Debug Telemetry Badge (Hidden by default; shown only via ?debug=1, ?hud=1, or Backquote `) -->
+    <header id="pt-telemetry-badge" class="pt-telemetry-badge hidden" aria-label="Corridor Engine Telemetry">
+      <div class="pt-telemetry-header">
+        <span class="pt-rec-dot" aria-hidden="true"></span>
+        <span class="pt-engine-tag">ARGON STUDIO // CORRIDOR ENGINE</span>
+        <span id="hud-clock-label" class="pt-clock-led">23:59</span>
+      </div>
+      <div id="hud-loop-label" class="pt-loop-title">LOOP 02 / 05 — THE BATHROOM</div>
+      <div class="pt-telemetry-meta">
+        <span id="hud-flashlight-label">FLASHLIGHT: ON [F] • ZOOM [Z]</span>
+        <span class="pt-meta-sep">•</span>
+        <button id="btn-open-photo-badge" type="button" class="pt-photo-badge-btn" title="Inspect Torn Family Photograph (Tab / P)">
+          <span id="hud-photo-label">PHOTOGRAPH: 2 / 6</span>
+          <span class="pt-badge-key">[TAB]</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- 7. Developer Simulator Control Dock (Hidden by default; shown only via ?debug=1, ?hud=1, or Backquote `) -->
+    <nav id="pt-bottom-dock" class="pt-bottom-dock hidden" aria-label="Developer Scene Presets and Horror Controls">
+      <div id="pt-dock-inner" class="pt-dock-inner">
+        <!-- Row 1: 6 Reference Scene Pills + 0 Free Roam -->
+        <div class="pt-dock-row pt-dock-presets">
+          <span class="pt-dock-section-label">SCENES</span>
+          <button type="button" class="pt-pill pt-preset-pill active" data-preset="foyer_corridor" data-key="1">
+            <kbd>1</kbd> Foyer Corridor
+          </button>
+          <button type="button" class="pt-pill pt-preset-pill" data-preset="corner_radio_clock" data-key="2">
+            <kbd>2</kbd> Radio &amp; 23:59
+          </button>
+          <button type="button" class="pt-pill pt-preset-pill" data-preset="bathroom_sink_horror" data-key="3">
+            <kbd>3</kbd> Bathroom Sink
+          </button>
+          <button type="button" class="pt-pill pt-preset-pill" data-preset="lisa_corner_stalk" data-key="4">
+            <kbd>4</kbd> Lisa Stalk
+          </button>
+          <button type="button" class="pt-pill pt-preset-pill" data-preset="red_hell_fridge_loop" data-key="5">
+            <kbd>5</kbd> Red Hell Fridge
+          </button>
+          <button type="button" class="pt-pill pt-preset-pill" data-preset="lisa_jumpscare_closeup" data-key="6">
+            <kbd>6</kbd> Lisa Jump Scare
+          </button>
+          <button type="button" class="pt-pill pt-preset-pill" data-preset="free_roam" data-key="0">
+            <kbd>0</kbd> First-Person Roam
+          </button>
+        </div>
+
+        <!-- Row 2: Loop Selector Pills (L1..L5) & Horror Action Triggers -->
+        <div class="pt-dock-row pt-dock-actions">
+          <span class="pt-dock-section-label">LOOPS</span>
+          <div class="pt-loop-pill-group">
+            <button type="button" class="pt-pill pt-loop-pill" data-loop="1" title="Loop 1 — The Awakening">L1</button>
+            <button type="button" class="pt-pill pt-loop-pill active" data-loop="2" title="Loop 2 — The Broadcast & The Bathroom">L2</button>
+            <button type="button" class="pt-pill pt-loop-pill" data-loop="3" title="Loop 3 — Red Hell (204863)">L3</button>
+            <button type="button" class="pt-pill pt-loop-pill" data-loop="4" title="Loop 4 — The Blackout Stalker">L4</button>
+            <button type="button" class="pt-pill pt-loop-pill" data-loop="5" title="Loop 5 — You've Been Chosen">L5</button>
+          </div>
+
+          <span class="pt-dock-divider" aria-hidden="true"></span>
+
+          <button id="btn-action-flashlight" type="button" class="pt-pill pt-action-pill active" data-action="flashlight">
+            🔦 Flashlight <kbd>F</kbd>
+          </button>
+          <button id="btn-action-flicker" type="button" class="pt-pill pt-action-pill" data-action="flicker">
+            ⚡ Flicker Scare <kbd>X</kbd>
+          </button>
+          <button id="btn-action-jumpscare" type="button" class="pt-pill pt-action-pill pt-pill-danger" data-action="jumpscare">
+            💀 Jump Scare <kbd>J</kbd>
+          </button>
+          <button id="btn-action-radio" type="button" class="pt-pill pt-action-pill" data-action="radio">
+            📻 Radio 204863 <kbd>R</kbd>
+          </button>
+          <button id="btn-action-clues" type="button" class="pt-pill pt-action-pill" data-action="clues">
+            🧩 Photo <kbd>Tab</kbd>
+          </button>
+          <button id="btn-action-audio" type="button" class="pt-pill pt-action-pill" data-action="audio">
+            🔊 Audio <kbd>M</kbd>
+          </button>
+          <button id="btn-action-hud" type="button" class="pt-pill pt-action-pill" data-action="hide_hud">
+            ▾ Hide Debug <kbd>`</kbd>
+          </button>
+        </div>
+      </div>
+      <button id="pt-dock-restore-tab" type="button" class="pt-dock-restore-tab hidden">
+        ▴ Show Debug Controls <kbd>`</kbd>
+      </button>
+    </nav>
+  </div>
+
+  <!-- Main Orchestrator Entry Point (Classic Bundle for zero-CORS static web + localhost compatibility) -->
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

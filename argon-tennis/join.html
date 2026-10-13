@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Argon Tennis — Join Match</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: radial-gradient(circle at 50% 25%, #1d4e34 0%, #0b2217 100%);
+      color: #f4f8ff;
+    }
+    .card {
+      width: 100%;
+      max-width: 420px;
+      background: rgba(16, 26, 22, 0.94);
+      border: 2px solid rgba(125, 226, 76, 0.45);
+      border-radius: 26px;
+      padding: 28px 24px;
+      text-align: center;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(125, 226, 76, 0.16);
+      color: #98f56c;
+      border: 1px solid rgba(125, 226, 76, 0.45);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 5px 12px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+    }
+    h1 {
+      font-size: 26px;
+      font-weight: 800;
+      margin-bottom: 6px;
+      letter-spacing: -0.02em;
+    }
+    .sub {
+      font-size: 14px;
+      color: rgba(230, 242, 255, 0.72);
+      margin-bottom: 22px;
+    }
+    .game-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 15px 20px;
+      background: linear-gradient(180deg, #7ee846 0%, #3ca618 100%);
+      color: #071a0a;
+      font-size: 17px;
+      font-weight: 800;
+      text-decoration: none;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(82, 214, 36, 0.35);
+      margin-bottom: 22px;
+      transition: transform 0.12s ease;
+    }
+    .game-btn:hover { transform: translateY(-1px); }
+    .qr-section {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 18px 16px;
+    }
+    .qr-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #c8e6ff;
+      margin-bottom: 12px;
+    }
+    .qr-frame {
+      display: inline-block;
+      background: #ffffff;
+      padding: 10px;
+      border-radius: 16px;
+      margin-bottom: 12px;
+    }
+    .qr-frame img {
+      display: block;
+      width: 210px;
+      height: 210px;
+    }
+    .phone-url {
+      display: block;
+      font-size: 12.5px;
+      color: #7dd3fc;
+      word-break: break-all;
+      text-decoration: underline;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="badge" id="room-badge">Room • Player 2</div>
+    <h1>🎾 Argon Tennis</h1>
+    <p class="sub" id="match-sub">Open your game on laptop &amp; scan for your phone racket</p>
+
+    <a id="game-link" class="game-btn" href="#">
+      <span>🖥️ Open Game (Desktop)</span>
+    </a>
+
+    <div class="qr-section">
+      <div class="qr-title">📱 Scan with Phone Camera for Controller</div>
+      <div class="qr-frame">
+        <img id="qr-img" alt="Phone Controller QR Code" src="" />
+      </div>
+      <a id="phone-link" class="phone-url" href="#">Loading controller URL...</a>
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const room = (params.get('room') || 'default').trim().toLowerCase();
+    const role = (params.get('role') || 'p2').trim().toLowerCase() === 'p1' ? 'p1' : 'p2';
+    const roleLabel = role === 'p1' ? 'Player 1' : 'Player 2';
+
+    document.getElementById('room-badge').textContent = `Room #${room.toUpperCase()} • ${roleLabel}`;
+
+    const base = window.location.origin;
+    const gameUrl = `${base}/index.html?room=${encodeURIComponent(room)}&role=${role}`;
+    const phoneUrl = `${base}/companion.html?room=${encodeURIComponent(room)}&role=${role}`;
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=10&format=png&data=${encodeURIComponent(phoneUrl)}`;
+
+    const gameEl = document.getElementById('game-link');
+    gameEl.href = gameUrl;
+
+    const phoneEl = document.getElementById('phone-link');
+    phoneEl.href = phoneUrl;
+    phoneEl.textContent = phoneUrl;
+
+    document.getElementById('qr-img').src = qrUrl;
+
+    fetch(`/api/racket/state?room=${encodeURIComponent(room)}&role=${role}`)
+      .then((r) => r.json())
+      .then((data) => {
+        const m = data && data.match;
+        if (m && m.urls) {
+          const dUrl = role === 'p1' ? m.urls.p1DesktopUrl : m.urls.p2DesktopUrl;
+          const cUrl = role === 'p1' ? m.urls.p1CompanionUrl : m.urls.p2CompanionUrl;
+          const qUrl = role === 'p1' ? m.urls.p1QrUrl : m.urls.p2QrUrl;
+          if (dUrl) gameEl.href = dUrl;
+          if (cUrl) {
+            phoneEl.href = cUrl;
+            phoneEl.textContent = cUrl;
+          }
+          if (qUrl) document.getElementById('qr-img').src = qUrl;
+        }
+      })
+      .catch(() => {});
+  </script>
+</body>
+</html>

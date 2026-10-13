@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="description" content="Argon Tennis — 3D arcade tennis game with high-speed racket kinematics, expressive 3D characters, webcam &amp; phone motion controls, and spatial audio." />
+  <title>Argon Tennis</title>
+  <script>
+    (function () {
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('play') || params.has('state')) {
+        document.documentElement.classList.add('autoplay-mode');
+      }
+      const stateParam = (params.get('state') || '').toLowerCase();
+      if (stateParam) {
+        document.documentElement.setAttribute('data-url-state', stateParam);
+      }
+    })();
+  </script>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "./assets/vendor/three.module.js"
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div id="root" class="hidden" aria-hidden="true"></div>
+  <!-- 3D WebGL Viewport -->
+  <div id="canvas-container" aria-label="Argon Tennis 3D Stadium Viewport">
+    <canvas id="game-canvas"></canvas>
+  </div>
+
+  <!-- Argon Tennis Arcade HUD Layer -->
+  <div id="hud-root">
+    <!-- Top HUD Bar: Left Games Pill | Center Scoreboard Pill | Right Games Pill -->
+    <header id="top-hud-bar">
+      <!-- Top-Left Player Games Won Bubbles (matches ref_06_game_point_hud.png) -->
+      <div id="games-pill-player" class="wii-games-pill" title="Player Games Won">
+        <span class="game-bubble" data-slot="0"></span>
+        <span class="game-bubble" data-slot="1"></span>
+        <span class="game-bubble extra-slot hidden" data-slot="2"></span>
+      </div>
+
+      <!-- Top-Center Dark Translucent Scoreboard Pill -->
+      <div id="scoreboard-pill" class="wii-scoreboard-pill">
+        <div class="mii-side mii-side-player">
+          <div class="mii-avatar-badge player-tint">
+            <canvas id="mii-icon-player" width="192" height="192"></canvas>
+          </div>
+          <div class="mii-avatar-badge player-tint secondary-mii">
+            <canvas id="mii-icon-player-2" width="192" height="192"></canvas>
+          </div>
+        </div>
+
+        <div id="score-center-display" class="score-center-display">
+          <span id="score-player-text" class="score-digits">00</span>
+          <span id="score-separator" class="score-dash">-</span>
+          <span id="score-opponent-text" class="score-digits">00</span>
+        </div>
+
+        <div class="mii-side mii-side-opponent">
+          <div class="mii-avatar-badge opponent-tint secondary-mii">
+            <canvas id="mii-icon-opponent-2" width="192" height="192"></canvas>
+          </div>
+          <div class="mii-avatar-badge opponent-tint">
+            <canvas id="mii-icon-opponent" width="192" height="192"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top-Right Opponent Games Won Bubbles -->
+      <div id="games-pill-opponent" class="wii-games-pill" title="Opponent Games Won">
+        <span class="game-bubble" data-slot="0"></span>
+        <span class="game-bubble" data-slot="1"></span>
+        <span class="game-bubble extra-slot hidden" data-slot="2"></span>
+      </div>
+    </header>
+
+    <!-- Subtle 1v1 Opponent Presence & Controller Ready Indicator -->
+    <div id="opponent-presence-pill" class="opponent-presence-pill hidden" aria-live="polite">
+      <span id="opponent-presence-dot" class="presence-dot"></span>
+      <span id="opponent-presence-text">Waiting for Player 2…</span>
+    </div>
+
+    <!-- 3D-Projected Floating Tags (Server Tag, Stance Nameplates, Shot Timing Popup) -->
+    <div id="world-labels-layer">
+      <!-- Iconic Yellow "Server" Box above the serving player's head -->
+      <div id="server-tag" class="wii-server-tag hidden">
+        <span class="server-tag-text">Server</span>
+      </div>
+
+      <!-- Court Nameplate Tag at Player Feet during Serve Setup -->
+      <div id="player-nameplate" class="wii-court-nameplate player-plate hidden">
+        <canvas id="plate-mii-player" width="192" height="192"></canvas>
+        <div class="plate-info">
+          <div class="plate-name">Ammaar</div>
+          <div class="plate-skill">Skill Level 1050</div>
+        </div>
+      </div>
+
+      <!-- Floating Timing & Shot Type Callout above Player on Contact -->
+      <div id="timing-popup" class="wii-timing-popup hidden">
+        <span id="timing-popup-grade" class="timing-grade">PERFECT</span>
+        <span id="timing-popup-detail" class="timing-detail">POWER TOPSPIN • 178 KM/H</span>
+      </div>
+    </div>
+
+    <!-- Center Glossy Arcade Callout Banner ("Start", "Game Point", "15 - 00", "Nice Shot!") -->
+    <div id="center-banner-layer" class="center-banner-layer hidden">
+      <div id="center-banner-streak" class="center-banner-streak"></div>
+      <div id="center-banner-text" class="center-banner-text style-gold">Game Point</div>
+      <div id="center-banner-sub" class="center-banner-sub hidden"></div>
+    </div>
+
+    <!-- Bottom-Left Instant Replay Pill Badge -->
+    <div id="replay-badge" class="wii-replay-badge hidden">
+      <span class="replay-dots">
+        <i class="dot dot-1"></i>
+        <i class="dot dot-2"></i>
+        <i class="dot dot-3"></i>
+      </span>
+      <span class="replay-label">Replay</span>
+    </div>
+
+    <!-- Bottom-Left Compact Audio, Camera & Multiplayer Dock -->
+    <div id="bottom-left-dock" class="hud-corner-dock bottom-left-dock">
+      <div class="dock-pill-row">
+        <button id="btn-audio-toggle" class="hud-mini-btn" type="button" title="Toggle Lyria 3 Soundtrack & SFX">
+          <span class="btn-dot music-on" id="audio-status-dot"></span>
+          <span id="audio-track-label">Lyria: Sunny Rally</span>
+        </button>
+        <button id="btn-camera-cycle" class="hud-mini-btn" type="button" title="Cycle Camera Angle (C)">
+          <span>Cam:</span>
+          <strong id="camera-mode-label">Rally</strong>
+        </button>
+        <button id="btn-replay-trigger" class="hud-mini-btn" type="button" title="Toggle Instant Replay (R)">
+          <span>Replay</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Bottom-Right Compact Motion Controller, Webcam PiP & Timing Gauge Dock -->
+    <div id="bottom-right-dock" class="hud-corner-dock bottom-right-dock">
+      <!-- Swing Timing & Serve Apex Gauge -->
+      <div id="timing-gauge-card" class="timing-gauge-card">
+        <div class="gauge-header">
+          <span id="gauge-mode-title">SWING TIMING</span>
+          <span id="gauge-speed-readout">READY</span>
+        </div>
+        <div class="timing-bar-track">
+          <div class="timing-zone zone-early">EARLY (Cross)</div>
+          <div class="timing-zone zone-sweet">SWEET SPOT</div>
+          <div class="timing-zone zone-late">LATE (Line)</div>
+          <div id="timing-cursor" class="timing-cursor" style="left: 50%;"></div>
+        </div>
+      </div>
+
+      <!-- Compact Motion Input Controls & Webcam PiP -->
+      <div class="motion-controls-row">
+        <div id="webcam-pip-card" class="webcam-pip-card hidden">
+          <video id="webcam-video" autoplay playsinline muted></video>
+          <canvas id="webcam-canvas" width="160" height="120"></canvas>
+          <div class="pip-badge">
+            <span class="pip-live-dot"></span>
+            <span id="pip-motion-label">Webcam Swing</span>
+          </div>
+        </div>
+
+        <div class="motion-buttons-col">
+          <button id="btn-webcam-toggle" class="hud-mini-btn motion-btn" type="button">
+            <span class="btn-dot" id="webcam-status-dot"></span>
+            <span>Webcam Motion</span>
+          </button>
+          <button id="btn-phone-racket" class="hud-mini-btn motion-btn" type="button">
+            <span class="btn-dot" id="phone-status-dot"></span>
+            <span id="phone-status-label">Pocket Racket</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Argon Tennis Title Screen & Match Setup Modal (Auto-hidden on ?play=1 or ?state=...) -->
+  <div id="title-modal" class="wii-modal-backdrop">
+    <div class="wii-title-card">
+      <div class="wii-logo-header">
+        <h1 class="argon-logo-title">
+          <span class="logo-word-argon">Argon</span><span class="logo-word-tennis">Tennis</span>
+        </h1>
+      </div>
+
+      <!-- Green Turf Court Position Preview -->
+      <div class="court-preview-diagram">
+        <div class="mini-court-turf">
+          <div class="mini-court-lines">
+            <div class="mini-net-line"></div>
+            <div class="mini-service-box top"></div>
+            <div class="mini-service-box bottom"></div>
+          </div>
+          <!-- Opponent Avatar Marker -->
+          <div class="court-slot-marker opponent-marker">
+            <canvas id="setup-mii-opponent" width="192" height="192"></canvas>
+            <div id="setup-opponent-label" class="slot-tag cpu-tag">Club AI</div>
+          </div>
+          <!-- Player Avatar Marker -->
+          <div class="court-slot-marker player-marker">
+            <canvas id="setup-mii-player" width="192" height="192"></canvas>
+            <div class="slot-tag you-tag">You</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Match Mode Selection (Casual AI | Pro AI | 1v1 Match) -->
+      <div class="setup-section">
+        <div class="wii-green-btn-row" id="difficulty-mode-group">
+          <button type="button" class="wii-green-choice selected" data-difficulty="casual">
+            <span class="choice-main">Casual AI</span>
+          </button>
+          <button type="button" class="wii-green-choice" data-difficulty="pro">
+            <span class="choice-main">Pro AI</span>
+          </button>
+          <button type="button" class="wii-green-choice" data-difficulty="1v1">
+            <span class="choice-main">1v1 Match</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Match Length (Hidden automatically in 1v1 mode, which is always Single Match) -->
+      <div class="setup-section" id="match-length-section">
+        <div class="wii-green-btn-row" id="match-length-group">
+          <button type="button" class="wii-green-choice" data-games="1">
+            <span class="choice-main">1 Game</span>
+          </button>
+          <button type="button" class="wii-green-choice selected" data-games="3">
+            <span class="choice-main">Best of 3</span>
+          </button>
+          <button type="button" class="wii-green-choice" data-games="5">
+            <span class="choice-main">Best of 5</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Primary Start Button -->
+      <div class="wii-modal-actions">
+        <button id="btn-start-match" type="button" class="wii-ok-btn">
+          <span class="hand-cursor-icon">🎾</span>
+          <span>Start Match</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clean Phone Controller QR Dialog -->
+  <div id="companion-modal" class="wii-modal-backdrop hidden">
+    <div class="wii-dialog-box wii-companion-clean-dialog">
+      <div class="mp-dialog-header">
+        <h2 class="dialog-title">📱 Phone Controller</h2>
+        <span id="mp-active-status" class="mp-conn-tag">Scan QR</span>
+      </div>
+
+      <p class="dialog-desc">Scan with your phone camera</p>
+
+      <!-- Player 1 QR View -->
+      <div id="mp-card-p1" class="mp-clean-qr-wrap">
+        <span id="mp-p1-status" class="hidden"></span>
+        <img id="companion-qr" src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=10&format=png&data=http%3A%2F%2Flocalhost%3A8080%2Fcompanion.html%3Froom%3Ddefault%26role%3Dp1" alt="Phone Controller QR" width="200" height="200" class="mp-qr-img" />
+        <a id="companion-link" href="/companion.html?room=default&role=p1" target="_blank" rel="noopener" class="mp-subtle-link">Open controller link ↗</a>
+      </div>
+
+      <!-- Player 2 QR View -->
+      <div id="mp-card-p2" class="mp-clean-qr-wrap hidden">
+        <span id="mp-p2-status" class="hidden"></span>
+        <img id="companion-qr-p2" src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=10&format=png&data=http%3A%2F%2Flocalhost%3A8080%2Fcompanion.html%3Froom%3Ddefault%26role%3Dp2" alt="Phone Controller QR" width="200" height="200" class="mp-qr-img" />
+        <a id="companion-link-p2" href="/companion.html?room=default&role=p2" target="_blank" rel="noopener" class="mp-subtle-link">Open controller link ↗</a>
+      </div>
+
+      <div class="dialog-actions">
+        <button id="btn-close-companion" type="button" class="wii-pill-btn">Back to Court</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Post-Match Skill Level Graph Modal -->
+  <div id="victory-modal" class="wii-modal-backdrop hidden">
+    <div class="wii-skill-card">
+      <div class="skill-card-header">Club Skill Rating</div>
+      <div class="skill-card-body">
+        <div class="skill-chart-frame">
+          <canvas id="skill-graph-canvas" width="280" height="200"></canvas>
+        </div>
+        <div class="skill-mii-summary">
+          <div id="victory-result-banner" class="victory-result-banner">YOU WIN!</div>
+          <div class="skill-score-pill">
+            <canvas id="victory-mii-icon" width="192" height="192"></canvas>
+            <div class="skill-score-meta">
+              <div class="skill-rating-number" id="skill-rating-value">1120</div>
+              <div class="skill-player-name">Ammaar (+120)</div>
+            </div>
+          </div>
+          <div id="victory-match-score" class="victory-match-score">Final Games: 2 - 0</div>
+        </div>
+      </div>
+      <div class="skill-card-footer">
+        <button id="btn-play-again" type="button" class="wii-footer-btn primary">Play again</button>
+        <button id="btn-return-title" type="button" class="wii-footer-btn secondary">Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { renderAllHudMiiAvatars } from './src/mii_avatars.js';
+    renderAllHudMiiAvatars();
+  </script>
+  <script type="module" src="./src/game_engine.js"></script>
+</body>
+</html>

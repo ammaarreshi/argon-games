@@ -1,0 +1,839 @@
+/* ============================================================================
+ * Argon Valley — Argon Valley Bubbly UI Stylesheet
+ * Palette: Warm Cream (#fffdf4), Nook Mint (#7ce0b8), Sky Blue (#5ec4f8),
+ *          Coral Sunset (#ff7e6b), Golden Amber (#f5a623), Cocoa Ink (#544535)
+ * ============================================================================ */
+
+:root {
+  --valley-cream: #fffdf4;
+  --valley-cream-soft: rgba(255, 253, 244, 0.94);
+  --valley-cream-border: #f0e6ce;
+  --valley-mint: #7ce0b8;
+  --valley-mint-dark: #3ca982;
+  --valley-sky: #5ec4f8;
+  --valley-sky-dark: #2a8fc7;
+  --valley-coral: #ff7e6b;
+  --valley-amber: #f5a623;
+  --valley-ink: #544535;
+  --valley-ink-muted: #84725e;
+  --valley-shadow: 0 10px 26px rgba(62, 46, 28, 0.18), 0 3px 8px rgba(62, 46, 28, 0.1);
+  --valley-font: "Nunito", "Quicksand", "Varela Round", "Hiragino Maru Gothic ProN",
+    "Rounded Mplus 1c", "Trebuchet MS", system-ui, -apple-system, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+html,
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #67c5e8;
+  font-family: var(--valley-font);
+  color: var(--valley-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 3D Canvas Viewport */
+#canvas-container,
+body > canvas,
+#canvas-container > canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  display: block;
+  z-index: 1;
+  outline: none;
+}
+
+/* Clean Screenshot Mode (?clean=1 or ?hud=0) */
+html.clean-mode #ui-root,
+html.clean-mode .valley-hud,
+body.clean-mode #ui-root,
+body.clean-mode .valley-hud,
+#ui-root.clean-hidden {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Main HUD Overlay Container */
+.valley-hud {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 18px 22px;
+}
+
+.valley-hud > * {
+  pointer-events: auto;
+}
+
+/* ============================================================================
+ * 1. Top-Left Valley Pocket Scene & Camera Bar
+ * ============================================================================ */
+.pocket-card {
+  position: fixed;
+  top: 16px;
+  left: 18px;
+  width: 336px;
+  max-width: calc(100vw - 36px);
+  background: var(--valley-cream-soft);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 3px solid #ffffff;
+  border-radius: 26px;
+  box-shadow: var(--valley-shadow);
+  padding: 12px 14px 14px;
+  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 0.2s ease;
+  z-index: 20;
+}
+
+.pocket-card.collapsed .pocket-body {
+  display: none;
+}
+
+.pocket-card.collapsed {
+  width: auto;
+  padding: 9px 13px;
+}
+
+.pocket-header {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.pocket-leaf-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #86e6c0, #48b88e);
+  color: #fffdf4;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 7px rgba(60, 169, 130, 0.35);
+  flex-shrink: 0;
+}
+
+.pocket-title-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.pocket-title {
+  font-size: 14.5px;
+  font-weight: 800;
+  color: var(--valley-ink);
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+
+.pocket-subtitle {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--valley-ink-muted);
+  margin-top: 1px;
+}
+
+.pocket-icon-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+  background: #f2e8d2;
+  color: var(--valley-ink);
+  font-weight: 900;
+  font-size: 14px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.16s ease, background 0.16s ease;
+}
+
+.pocket-icon-btn:hover {
+  background: var(--valley-mint);
+  color: #fff;
+  transform: scale(1.1);
+}
+
+.pocket-body {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pocket-section-label {
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--valley-ink-muted);
+}
+
+/* 6 Iconic Scene Buttons */
+.scene-preset-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+
+.scene-pill {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 9px;
+  border-radius: 16px;
+  border: 2px solid #efe4ca;
+  background: #fff9e8;
+  color: var(--valley-ink);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  text-align: left;
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
+    background 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.scene-pill:hover {
+  transform: translateY(-1.5px) scale(1.02);
+  background: #ffffff;
+  border-color: var(--valley-mint);
+}
+
+.scene-pill.active {
+  background: linear-gradient(135deg, #7ce0b8 0%, #57c99d 100%);
+  border-color: #ffffff;
+  color: #fffdf4;
+  box-shadow: 0 4px 10px rgba(72, 184, 142, 0.35);
+}
+
+.scene-pill .pill-num {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(84, 69, 53, 0.12);
+  color: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+.scene-pill.active .pill-num {
+  background: rgba(255, 255, 255, 0.28);
+  color: #ffffff;
+}
+
+.scene-pill.free-roam-pill {
+  grid-column: span 2;
+  justify-content: center;
+  background: #eef9ff;
+  border-color: #cdebfa;
+}
+
+.scene-pill.free-roam-pill.active {
+  background: linear-gradient(135deg, #5ec4f8 0%, #3aa3e0 100%);
+  border-color: #ffffff;
+  color: #ffffff;
+}
+
+/* Time of Day Pills */
+.tod-pill-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 5px;
+}
+
+.tod-pill {
+  padding: 5px 8px;
+  border-radius: 999px;
+  border: 2px solid #efe4ca;
+  background: #fff9e8;
+  color: var(--valley-ink);
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1),
+    background 0.15s ease, border-color 0.15s ease;
+}
+
+.tod-pill:hover {
+  transform: scale(1.03);
+  border-color: var(--valley-sky);
+}
+
+.tod-pill.active {
+  background: linear-gradient(135deg, #ff9966 0%, #ff7e6b 100%);
+  border-color: #ffffff;
+  color: #fffdf4;
+  box-shadow: 0 3px 9px rgba(255, 126, 107, 0.35);
+}
+
+/* World Curve Slider */
+.pocket-curve-row {
+  background: #f8f0dc;
+  border-radius: 15px;
+  padding: 7px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.curve-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.curve-toggle-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 2px 9px;
+  font-family: inherit;
+  font-size: 10.5px;
+  font-weight: 900;
+  cursor: pointer;
+  background: #d8ccb4;
+  color: var(--valley-ink);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.curve-toggle-btn.active {
+  background: var(--valley-mint-dark);
+  color: #fffdf4;
+}
+
+.curve-slider-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#curve-slider {
+  flex: 1;
+  accent-color: var(--valley-mint-dark);
+  height: 6px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.curve-val {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--valley-ink);
+  min-width: 42px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================================
+ * 2. Bottom-Left Authentic Argon Valley Clock & Weather HUD
+ * ============================================================================ */
+.valley-clock-hud {
+  position: fixed;
+  left: 26px;
+  bottom: 22px;
+  color: #fffdf4;
+  text-shadow: 0 2px 8px rgba(34, 26, 16, 0.42), 0 1px 2px rgba(34, 26, 16, 0.35);
+  z-index: 15;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+}
+
+.clock-top-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.weather-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateY(3px);
+  filter: drop-shadow(0 2px 5px rgba(34, 26, 16, 0.32));
+}
+
+.clock-time-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.clock-digits {
+  font-size: 38px;
+  font-weight: 900;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.clock-ampm {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  opacity: 0.96;
+}
+
+.clock-underline {
+  position: relative;
+  width: 156px;
+  height: 4px;
+  background: rgba(255, 253, 244, 0.94);
+  border-radius: 999px;
+  box-shadow: 0 2px 6px rgba(34, 26, 16, 0.28);
+  margin: 2px 0 4px;
+}
+
+.clock-underline-notch {
+  position: absolute;
+  left: 38px;
+  bottom: -4px;
+  width: 10px;
+  height: 5px;
+  background: rgba(255, 253, 244, 0.94);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+
+.clock-bottom-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.clock-date {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+.clock-day-badge {
+  background: rgba(255, 253, 244, 0.94);
+  color: #5b4b3a;
+  text-shadow: none;
+  font-size: 13px;
+  font-weight: 900;
+  padding: 2px 10px;
+  border-radius: 999px;
+  box-shadow: 0 2px 6px rgba(34, 26, 16, 0.25);
+}
+
+/* ============================================================================
+ * 3. Center-Bottom Creamy Argon Valley Villager Dialogue Bubble
+ * ============================================================================ */
+.valley-dialogue-container {
+  position: fixed;
+  left: 50%;
+  bottom: 26px;
+  transform: translateX(-50%);
+  width: min(560px, calc(100vw - 340px));
+  min-width: 320px;
+  z-index: 25;
+  opacity: 1;
+  visibility: visible;
+}
+
+.valley-dialogue-container.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(18px) scale(0.94);
+}
+
+.dialogue-speaker-badge {
+  display: inline-block;
+  background: var(--speaker-bg, #f49342);
+  color: var(--speaker-fg, #fffdf4);
+  font-size: 15px;
+  font-weight: 900;
+  padding: 5px 18px;
+  border-radius: 999px;
+  border: 3px solid #fffdf4;
+  box-shadow: 0 4px 10px rgba(62, 46, 28, 0.2);
+  transform: translate(18px, 11px) rotate(-3.5deg);
+  position: relative;
+  z-index: 2;
+}
+
+.dialogue-pillow {
+  position: relative;
+  background: var(--valley-cream);
+  border: 4px solid #f3e9d2;
+  border-radius: 38px 42px 36px 40px / 32px 36px 34px 38px;
+  box-shadow: var(--valley-shadow);
+  padding: 18px 44px 16px 26px;
+  min-height: 86px;
+  display: flex;
+  align-items: center;
+}
+
+.dialogue-content-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.dialogue-text {
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.42;
+  color: var(--valley-ink);
+  letter-spacing: 0.005em;
+}
+
+.dialogue-highlight {
+  color: #2196d3;
+  font-weight: 900;
+}
+
+.dialogue-choices-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.dialogue-choice-btn {
+  padding: 5px 13px;
+  border-radius: 999px;
+  border: 2px solid #ecdcb9;
+  background: #fff8e5;
+  color: var(--valley-ink);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1),
+    background 0.15s ease, border-color 0.15s ease;
+}
+
+.dialogue-choice-btn:hover {
+  transform: translateY(-1.5px) scale(1.04);
+  background: #ffffff;
+  border-color: var(--valley-sky);
+}
+
+.dialogue-choice-btn.gift-btn {
+  background: linear-gradient(135deg, #fff3d6 0%, #ffe4aa 100%);
+  border-color: #f5b942;
+  color: #6b4814;
+}
+
+.dialogue-choice-btn.gift-btn:hover {
+  background: linear-gradient(135deg, #f5b942 0%, #ef9a28 100%);
+  color: #fffdf4;
+}
+
+.dialogue-continue-arrow {
+  position: absolute;
+  right: 18px;
+  bottom: 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  animation: valleyArrowBounce 0.85s ease-in-out infinite;
+}
+
+@keyframes valleyArrowBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(5px);
+  }
+}
+
+/* ============================================================================
+ * 4. Pocket Inventory Grid, Bells Pill, Toast Banner & Context Prompt Pill
+ * ============================================================================ */
+.bells-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, #ffe999 0%, #f7c644 100%);
+  color: #5c4012;
+  border: 2px solid #ffffff;
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 12.5px;
+  font-weight: 900;
+  box-shadow: 0 2px 6px rgba(180, 125, 20, 0.25);
+  font-variant-numeric: tabular-nums;
+}
+
+.pocket-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.pocket-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff9e8;
+  border: 2px solid #efe3c8;
+  border-radius: 14px;
+  padding: 5px 10px;
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--valley-ink);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.pocket-chip.pop {
+  transform: scale(1.14);
+  background: #e9fbf2;
+  border-color: var(--valley-mint);
+}
+
+.chip-emoji {
+  font-size: 15px;
+}
+
+.chip-val {
+  font-variant-numeric: tabular-nums;
+}
+
+.fast-travel-drawer {
+  margin-top: 2px;
+  background: #f8f0dc;
+  border-radius: 14px;
+  padding: 6px 10px;
+}
+
+.fast-travel-summary {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--valley-ink);
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.fast-travel-summary::-webkit-details-marker {
+  display: none;
+}
+
+.fast-travel-summary::after {
+  content: "▾";
+  font-size: 12px;
+  color: var(--valley-ink-muted);
+}
+
+.fast-travel-drawer[open] .fast-travel-summary {
+  margin-bottom: 7px;
+}
+
+/* Celebratory Toast Banner */
+.island-toast-banner {
+  position: fixed;
+  top: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fffdf4;
+  border: 3.5px solid #ffffff;
+  border-radius: 999px;
+  box-shadow: 0 12px 28px rgba(48, 34, 18, 0.24);
+  padding: 9px 22px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 35;
+  opacity: 1;
+  visibility: visible;
+}
+
+.island-toast-banner.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(-16px) scale(0.92);
+}
+
+.toast-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.toast-text {
+  font-size: 14.5px;
+  font-weight: 900;
+  color: var(--valley-ink);
+}
+
+/* Floating 3D-Tracked Contextual Action Prompt Pill */
+.context-prompt-pill {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -100%);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 253, 244, 0.96);
+  border: 3px solid #ffffff;
+  border-radius: 999px;
+  padding: 6px 14px 6px 8px;
+  box-shadow: 0 8px 20px rgba(42, 30, 16, 0.26);
+  color: var(--valley-ink);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+  z-index: 22;
+  transition: opacity 0.16s ease, transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.context-prompt-pill:hover {
+  transform: translate(-50%, -104%) scale(1.06);
+  background: #ffffff;
+}
+
+.context-prompt-pill.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -85%) scale(0.9);
+}
+
+.prompt-key-badge {
+  background: linear-gradient(135deg, #5ec4f8 0%, #3298dc 100%);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 900;
+  padding: 3px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.03em;
+  box-shadow: 0 2px 5px rgba(50, 152, 220, 0.35);
+}
+
+.controls-guide-pill {
+  margin-top: 6px;
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  background: rgba(42, 33, 23, 0.56);
+  backdrop-filter: blur(6px);
+  color: #fffdf4;
+  text-shadow: none;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.controls-guide-pill b {
+  color: #ffe484;
+  font-weight: 900;
+}
+
+/* ============================================================================
+ * 5. Bottom-Right Tool & Outfit Switcher Dock
+ * ============================================================================ */
+.valley-tool-dock {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 7px;
+  z-index: 20;
+}
+
+.tool-bubble {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  border: 3px solid #ffffff;
+  background: var(--valley-cream-soft);
+  color: var(--valley-ink);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: var(--valley-shadow);
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
+    background 0.16s ease, color 0.16s ease;
+}
+
+.tool-bubble:hover {
+  transform: translateY(-2px) scale(1.04);
+  background: #ffffff;
+}
+
+.tool-bubble.active {
+  background: linear-gradient(135deg, #5ec4f8 0%, #399ee0 100%);
+  color: #fffdf4;
+  border-color: #ffffff;
+}
+
+.tool-key-badge {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(84, 69, 53, 0.13);
+  color: inherit;
+  font-size: 10.5px;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tool-bubble.active .tool-key-badge {
+  background: rgba(255, 255, 255, 0.28);
+  color: #ffffff;
+}
+
+.tool-bubble.audio-bubble.playing {
+  background: linear-gradient(135deg, #7ce0b8 0%, #48b88e 100%);
+  color: #fffdf4;
+}
+
+.tool-emoji {
+  font-size: 15px;
+  line-height: 1;
+}
+
+@media (max-width: 960px) {
+  .valley-dialogue-container {
+    width: calc(100vw - 40px);
+    bottom: 96px;
+  }
+  .pocket-card {
+    width: 280px;
+  }
+}

@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Argon Tennis — Pocket Racket</title>
+  <style>
+    :root {
+      --optic-yellow: #dfff00;
+      --argon-blue: #25a8f5;
+      --emerald: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 24%, #183d61 0%, #0b1d30 58%, #050d17 100%);
+      font-family: "Rounded Mplus 1c", "Nunito", "Varela Round", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: #f0f6fc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px 16px;
+      touch-action: none;
+    }
+
+    /* Ambient background glow that reacts to swing speed */
+    .swing-aura {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at 50% 36%, rgba(223, 255, 0, 0.22) 0%, rgba(37, 168, 245, 0.08) 42%, transparent 70%);
+      opacity: 0.15;
+      transition: opacity 0.08s ease;
+      z-index: 0;
+    }
+
+    /* Single Top Pill Bar: Connection Status + Gyro On/Connected Button */
+    .top-bar {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 360px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 8px 7px 14px;
+      border-radius: 999px;
+      background: rgba(10, 22, 36, 0.78);
+      backdrop-filter: blur(12px);
+      border: 1.5px solid rgba(148, 210, 255, 0.26);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .conn-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11.5px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      color: #e2f1ff;
+      cursor: pointer;
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 10px #22c55e;
+      flex-shrink: 0;
+    }
+
+    .status-dot.offline {
+      background: #f59e0b;
+      box-shadow: 0 0 8px #f59e0b;
+    }
+
+    .gyro-btn {
+      appearance: none;
+      border: 1.5px solid #ffffff;
+      border-radius: 999px;
+      padding: 7px 16px;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+      background: linear-gradient(180deg, #ffef5a 0%, #f59e0b 100%);
+      color: #132030;
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.45);
+      transition: transform 0.12s ease, background 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .gyro-btn:active {
+      transform: scale(0.95);
+    }
+
+    .gyro-btn.connected {
+      background: linear-gradient(180deg, #34d399 0%, #059669 100%);
+      color: #ffffff;
+      border-color: #a7f3d0;
+      box-shadow: 0 0 16px rgba(16, 185, 129, 0.55);
+    }
+
+    /* =====================================================================
+       3D-TILTING SCULPTURAL TENNIS RACKET (NO BUTTON CLUTTER)
+       ===================================================================== */
+    .racket-stage {
+      position: relative;
+      z-index: 2;
+      flex: 1;
+      width: 100%;
+      max-width: 360px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      perspective: 950px;
+      margin: 4px 0;
+    }
+
+    .racket-rig {
+      width: 100%;
+      height: 100%;
+      max-height: 760px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transform-style: preserve-3d;
+      will-change: transform;
+      transition: transform 0.045s linear;
+    }
+
+    /* 1. OVAL TENNIS RACKET HEAD HOOP */
+    .racket-head {
+      position: relative;
+      width: 92%;
+      height: 390px;
+      border-radius: 50% 50% 45% 45% / 48% 48% 40% 40%;
+      padding: 13px;
+      background:
+        linear-gradient(135deg, #ffffff 0%, #e6f2ff 42%, #99ceff 78%, #1e88e5 100%);
+      border: 3.5px solid #e0f2fe;
+      box-shadow:
+        0 20px 44px rgba(0, 0, 0, 0.58),
+        inset 0 3px 6px rgba(255, 255, 255, 0.95),
+        inset 0 -6px 14px rgba(12, 74, 138, 0.45),
+        0 0 0 2.5px rgba(37, 168, 245, 0.65);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 4;
+      flex-shrink: 0;
+    }
+
+    .racket-head.swing-flash {
+      box-shadow:
+        0 0 38px rgba(223, 255, 0, 0.85),
+        0 20px 44px rgba(0, 0, 0, 0.58),
+        inset 0 3px 8px #ffffff,
+        0 0 0 3px #dfff00;
+    }
+
+    /* Inner Carbon Rim & String Bed Well */
+    .string-bed-shell {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 48% 48% 43% 43% / 46% 46% 38% 38%;
+      background:
+        radial-gradient(circle at 50% 45%, rgba(28, 92, 54, 0.92) 0%, rgba(14, 52, 31, 0.96) 68%, rgba(8, 30, 19, 0.98) 100%);
+      border: 4px solid #162a40;
+      box-shadow:
+        inset 0 8px 22px rgba(0, 0, 0, 0.75),
+        0 1px 0 rgba(255, 255, 255, 0.85);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #racket-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Floating Live Callout Pill at Bottom of String Bed */
+    .live-swing-badge {
+      position: absolute;
+      bottom: 26px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 5px 13px;
+      border-radius: 999px;
+      background: rgba(9, 18, 28, 0.9);
+      border: 1.5px solid rgba(223, 255, 0, 0.72);
+      color: var(--optic-yellow);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+      pointer-events: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.55);
+      z-index: 6;
+    }
+
+    /* 2. OPEN V-THROAT YOKE CONNECTING HOOP TO HANDLE */
+    .racket-throat {
+      position: relative;
+      width: 220px;
+      height: 102px;
+      margin-top: -18px;
+      margin-bottom: -14px;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* Left & Right Graphite V-Throat Struts converging from Hoop down into Handle */
+    .throat-strut {
+      position: absolute;
+      top: -10px;
+      bottom: -10px;
+      width: 20px;
+      border-radius: 10px;
+      background: linear-gradient(90deg, #1d354d 0%, #eff6ff 48%, #8bc2f5 85%, #1e88e5 100%);
+      border: 2px solid #e0f2fe;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .throat-strut.left {
+      left: 34px;
+      transform: rotate(-22deg);
+    }
+
+    .throat-strut.right {
+      right: 34px;
+      transform: rotate(22deg);
+    }
+
+    /* Live Gyro Readout Pod suspended inside the V-Throat Bridge */
+    .gyro-throat-pod {
+      position: relative;
+      z-index: 5;
+      width: 196px;
+      padding: 7px 12px;
+      border-radius: 14px;
+      background: rgba(10, 22, 36, 0.92);
+      border: 1.5px solid rgba(123, 224, 255, 0.45);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .gyro-pod-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 9.5px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      color: #b8dcff;
+    }
+
+    .gyro-pod-val {
+      color: #ffffff;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .gforce-bar-track {
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      overflow: hidden;
+    }
+
+    .gforce-bar-fill {
+      height: 100%;
+      width: 8%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #38bdf8 0%, #22c55e 50%, #dfff00 100%);
+      transition: width 0.05s linear;
+    }
+
+    /* 3. SCULPTED PRO-OVERGRIP HANDLE (PURE TACTILE GRIP, NO BUTTONS) */
+    .racket-handle {
+      position: relative;
+      z-index: 4;
+      width: 84px;
+      height: 215px;
+      border-radius: 12px 12px 26px 26px;
+      background:
+        repeating-linear-gradient(
+          -16deg,
+          rgba(255, 255, 255, 0.95) 0px,
+          rgba(244, 249, 255, 0.95) 22px,
+          rgba(195, 212, 230, 0.96) 22px,
+          rgba(175, 194, 214, 0.96) 25px
+        );
+      border: 3px solid #cbd5e1;
+      box-shadow:
+        0 18px 36px rgba(0, 0, 0, 0.65),
+        inset 10px 0 16px rgba(255, 255, 255, 0.9),
+        inset -12px 0 18px rgba(100, 120, 145, 0.55);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 0 12px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    /* Neon Finishing Tape Collar at Top of Grip */
+    .grip-finishing-tape {
+      width: 100%;
+      height: 12px;
+      background: linear-gradient(90deg, #0077e6 0%, #dfff00 50%, #0077e6 100%);
+      border-bottom: 2px solid #0f172a;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Subtle Grip Center Spine & Acoustic Speaker Dots */
+    .handle-spine {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      opacity: 0.72;
+    }
+
+    .speaker-dots {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 5px 7px;
+    }
+
+    .speaker-dots i {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #475569;
+      box-shadow: inset 0 1px 1px rgba(0,0,0,0.6), 0 1px 0 #fff;
+    }
+
+    .handle-brand-vertical {
+      font-size: 9.5px;
+      font-weight: 900;
+      letter-spacing: 0.18em;
+      color: #334155;
+      text-transform: uppercase;
+    }
+
+    /* Butt-Cap Player LEDs */
+    .buttcap-leds {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: #0f172a;
+      border: 1.5px solid #475569;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
+    }
+
+    .led-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #334155;
+      transition: all 0.15s ease;
+    }
+
+    .led-dot.on {
+      background: var(--optic-yellow);
+      box-shadow: 0 0 10px var(--optic-yellow), 0 0 4px #ffffff;
+    }
+  </style>
+</head>
+<body>
+  <div id="swing-aura" class="swing-aura"></div>
+
+  <!-- Minimal Top Pill: Connection Status + Gyro On/Connected Button -->
+  <header class="top-bar">
+    <div id="conn-pill" class="conn-pill" title="Tap to switch Player 1 / Player 2">
+      <span id="conn-dot" class="status-dot"></span>
+      <span id="conn-text">P1 RACKET • LIVE</span>
+    </div>
+    <button id="enable-motion-btn" class="gyro-btn" type="button">Enable Gyro</button>
+  </header>
+
+  <!-- Pure 3D-Tilting Tennis Racket -->
+  <main id="racket-stage" class="racket-stage" aria-label="Argon Tennis Racket">
+    <div id="racket-rig" class="racket-rig">
+      <!-- 1. Oval Tennis Racket Head & Interactive String Bed -->
+      <section id="racket-head" class="racket-head">
+        <div class="string-bed-shell">
+          <canvas id="racket-canvas" width="320" height="360"></canvas>
+        </div>
+        <div id="shot-callout" class="live-swing-badge">SWING PHONE TO HIT • LIFT UP TO TOSS</div>
+      </section>
+
+      <!-- 2. Open V-Throat Yoke with Live Gyro Readout -->
+      <section class="racket-throat">
+        <div class="throat-strut left"></div>
+        <div class="throat-strut right"></div>
+        <div class="gyro-throat-pod">
+          <div class="gyro-pod-row">
+            <span>GYRO TILT</span>
+            <span id="tilt-readout" class="gyro-pod-val">0° / 0°</span>
+          </div>
+          <div class="gyro-pod-row">
+            <span>SWING G-FORCE</span>
+            <span id="accel-readout" class="gyro-pod-val">0.0 m/s²</span>
+          </div>
+          <div class="gforce-bar-track">
+            <div id="accel-bar" class="gforce-bar-fill"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. Pro-Wrapped Tennis Grip Handle -->
+      <section class="racket-handle">
+        <div class="grip-finishing-tape"></div>
+        <div class="handle-spine">
+          <div class="speaker-dots" aria-hidden="true">
+            <i></i><i></i><i></i>
+            <i></i><i></i><i></i>
+            <i></i><i></i><i></i>
+          </div>
+          <div class="handle-brand-vertical">ARGON 98</div>
+        </div>
+        <div class="buttcap-leds" aria-label="Player LEDs">
+          <div id="led-1" class="led-dot on"></div>
+          <div id="led-2" class="led-dot"></div>
+          <div id="led-3" class="led-dot"></div>
+          <div id="led-4" class="led-dot"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Hidden iOS 17.4+/18+ Safari Hardware Taptic Engine Switch Actuator -->
+  <label id="ios-taptic-label" for="ios-taptic-switch" aria-hidden="true" style="position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0;pointer-events:none;">
+    <input type="checkbox" id="ios-taptic-switch" switch />
+  </label>
+
+  <script type="module">
+    const connPill = document.getElementById('conn-pill');
+    const connDot = document.getElementById('conn-dot');
+    const connText = document.getElementById('conn-text');
+    const enableMotionBtn = document.getElementById('enable-motion-btn');
+    const racketRig = document.getElementById('racket-rig');
+    const racketHead = document.getElementById('racket-head');
+    const swingAura = document.getElementById('swing-aura');
+    const canvas = document.getElementById('racket-canvas');
+    const ctx = canvas.getContext('2d');
+    const shotCallout = document.getElementById('shot-callout');
+    const tiltReadout = document.getElementById('tilt-readout');
+    const accelReadout = document.getElementById('accel-readout');
+    const accelBar = document.getElementById('accel-bar');
+    const iosTapticLabel = document.getElementById('ios-taptic-label');
+    const leds = [
+      document.getElementById('led-1'),
+      document.getElementById('led-2'),
+      document.getElementById('led-3'),
+      document.getElementById('led-4'),
+    ];
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const state = {
+      roomId: (urlParams.get('room') || 'default').trim() || 'default',
+      role: (urlParams.get('role') || 'p1').toLowerCase() === 'p2' ? 'p2' : 'p1',
+      pitch: 0,
+      roll: 0,
+      yaw: 0,
+      accelMag: 0,
+      lastAx: 0,
+      lastAy: 0,
+      lastAz: 0,
+      smoothPitch: 0,
+      smoothRoll: 0,
+      swingKickZ: 0,
+      swingKickX: 0,
+      swingKickY: 0,
+      lastSwingMs: 0,
+      seq: 0,
+      lastFeedbackSeq: -1,
+      motionEnabled: false,
+      motionHistory: [],
+      gyroTrail: [],
+      swipeTrail: [],
+      impactRings: [],
+      stringVibAmp: 0,
+      lastSwingArc: null,
+    };
+
+    function wrapAngleDelta(deg) {
+      return ((deg + 180) % 360 + 360) % 360 - 180;
+    }
+
+    function recordMotionSample(ax = state.lastAx, ay = state.lastAy, az = state.lastAz, mag = state.accelMag) {
+      const now = Date.now();
+      state.lastAx = ax;
+      state.lastAy = ay;
+      state.lastAz = az;
+      state.motionHistory.push({
+        t: now,
+        pitch: state.pitch,
+        roll: state.roll,
+        yaw: state.yaw,
+        ax,
+        ay,
+        az,
+        mag,
+      });
+      while (state.motionHistory.length > 1 && now - state.motionHistory[0].t > 220) {
+        state.motionHistory.shift();
+      }
+    }
+
+    /**
+     * Real-Time Gyro & Accelerometer Swing Classifier:
+     * Determines both Swing Side ('forehand' | 'backhand') and Shot Type ('topspin' | 'slice' | 'lob' | 'smash')
+     * from the 140ms orientation delta and 3-axis acceleration peak.
+     */
+    function classifyPhoneSwing(peak, history = state.motionHistory) {
+      const now = Date.now();
+      let startSample = history && history.length > 0 ? history[0] : null;
+      if (history && history.length > 1) {
+        for (let i = history.length - 1; i >= 0; i--) {
+          startSample = history[i];
+          if (now - history[i].t >= 140) break;
+        }
+      }
+
+      const pitchStart = startSample ? startSample.pitch : state.pitch;
+      const rollStart = startSample ? startSample.roll : state.roll;
+      const yawStart = startSample ? startSample.yaw : state.yaw;
+
+      const deltaPitch = wrapAngleDelta(state.pitch - pitchStart);
+      const deltaRoll = wrapAngleDelta(state.roll - rollStart);
+      const deltaYaw = wrapAngleDelta(state.yaw - yawStart);
+
+      // 1. Determine Swing Side ('forehand' | 'backhand')
+      let side = 'forehand';
+      let angleX = -0.35;
+      if (
+        peak.ax > 2.2 ||
+        deltaYaw < -10 ||
+        (Math.abs(peak.ax) < 2.2 && state.roll < -14)
+      ) {
+        side = 'backhand';
+        angleX = Math.max(0.25, Math.min(1.0, peak.ax / 12));
+      } else {
+        side = 'forehand';
+        angleX = Math.min(-0.25, Math.max(-1.0, peak.ax / 12));
+      }
+
+      // 2. Determine Shot Type ('toss' | 'swing' + 'topspin' | 'slice' | 'lob' | 'smash')
+      let type = 'swing';
+      let shotType = 'topspin';
+      let dirY = -0.45;
+      let speed = Math.min(1.58, Math.max(0.88, peak.mag / 12.8));
+
+      if (peak.ay > 6.2 && peak.mag < 15.5 && deltaPitch > 10) {
+        // Gentle/medium upward lift -> Serve Toss (or high defensive Lob if already in rally)
+        type = 'toss';
+        shotType = 'lob';
+        dirY = -0.9;
+        speed = Math.min(1.32, Math.max(0.9, peak.mag / 12.5));
+      } else if (deltaPitch > 24 || (peak.ay > 7.5 && state.pitch > 28)) {
+        // Steep upward scoop during rally -> Lob
+        type = 'swing';
+        shotType = 'lob';
+        dirY = -0.85;
+        speed = Math.min(1.38, Math.max(0.92, peak.mag / 13.0));
+      } else if (peak.mag >= 20.5 || (deltaPitch < -18 && peak.mag >= 14.5)) {
+        // Explosive high-G acceleration or fast downward overhead snap -> Power Smash
+        type = 'swing';
+        shotType = 'smash';
+        dirY = 0.65;
+        speed = Math.min(1.68, 1.32 + (peak.mag - 14) * 0.03);
+      } else if (
+        deltaPitch < -8 ||
+        peak.ay < -4.2 ||
+        (Math.abs(state.roll) > 26 && deltaPitch < 4)
+      ) {
+        // High-to-low cutting chop or open bevel wrist slice -> Slice
+        type = 'swing';
+        shotType = 'slice';
+        dirY = 0.55;
+        speed = Math.min(1.42, Math.max(0.88, peak.mag / 13.2));
+      } else {
+        // Low-to-high brushing whip or standard horizontal drive -> Topspin
+        type = 'swing';
+        shotType = 'topspin';
+        dirY = -0.45;
+        speed = Math.min(1.55, Math.max(0.9, peak.mag / 12.8));
+      }
+
+      return {
+        type,
+        shotType,
+        side,
+        speed,
+        angleX,
+        dirY,
+        deltaPitch,
+        deltaRoll,
+        deltaYaw,
+      };
+    }
+
+    function syncRoleUI() {
+      const roleTag = state.role.toUpperCase();
+      const roomTag = state.roomId !== 'default' ? ` • ${state.roomId.toUpperCase()}` : '';
+      connText.textContent = `${roleTag} RACKET${roomTag} • LIVE`;
+      leds.forEach((led, idx) => {
+        if (!led) return;
+        const activeIdx = state.role === 'p2' ? 1 : 0;
+        led.classList.toggle('on', idx === activeIdx);
+      });
+    }
+    syncRoleUI();
+
+    connPill.addEventListener('click', () => {
+      state.role = state.role === 'p1' ? 'p2' : 'p1';
+      state.lastFeedbackSeq = -1;
+      syncRoleUI();
+      shotCallout.textContent = `SWITCHED TO ${state.role.toUpperCase()} RACKET`;
+    });
+
+    // Web Audio synthesizer for racket air-whoosh + tactile sub-bass string impact
+    let audioCtx = null;
+    function ensureAudio() {
+      if (!audioCtx) {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (Ctx) audioCtx = new Ctx();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume().catch(() => {});
+      }
+      return audioCtx;
+    }
+
+    function triggerDeviceHaptic(kind = 'swing', intensity = 1.0) {
+      if (iosTapticLabel) {
+        try {
+          iosTapticLabel.click();
+          if (kind === 'power_hit' || kind === 'point_won' || intensity >= 1.25) {
+            setTimeout(() => {
+              try { iosTapticLabel.click(); } catch (_) {}
+            }, 58);
+          }
+          if (kind === 'point_won') {
+            setTimeout(() => {
+              try { iosTapticLabel.click(); } catch (_) {}
+            }, 125);
+          }
+        } catch (_) {}
+      }
+
+      if (navigator.vibrate) {
+        try {
+          if (kind === 'power_hit') {
+            navigator.vibrate([48, 26, 75]);
+          } else if (kind === 'hit') {
+            navigator.vibrate([38]);
+          } else if (kind === 'whiff' || kind === 'fault') {
+            navigator.vibrate([16, 38, 16]);
+          } else if (kind === 'point_won') {
+            navigator.vibrate([35, 30, 45, 30, 80]);
+          } else {
+            navigator.vibrate([24]);
+          }
+        } catch (_) {}
+      }
+    }
+
+    function playImpactHapticAudio(fb = {}) {
+      const ac = ensureAudio();
+      if (!ac) return;
+      const now = ac.currentTime;
+      const kind = String(fb.kind || 'hit');
+      const grade = String(fb.grade || 'GOOD').toUpperCase();
+      const isPower = /PERFECT|POWER|SMASH|ACE/i.test(grade) || Number(fb.intensity || 1) >= 1.25;
+
+      if (kind === 'whiff' || kind === 'fault') {
+        const osc = ac.createOscillator();
+        const gain = ac.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(140, now);
+        osc.frequency.exponentialRampToValueAtTime(58, now + 0.11);
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.linearRampToValueAtTime(0.11, now + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+        osc.connect(gain).connect(ac.destination);
+        osc.start(now);
+        osc.stop(now + 0.13);
+        return;
+      }
+
+      const sub = ac.createOscillator();
+      const subGain = ac.createGain();
+      sub.type = 'sine';
+      sub.frequency.setValueAtTime(isPower ? 86 : 72, now);
+      sub.frequency.exponentialRampToValueAtTime(42, now + 0.11);
+      subGain.gain.setValueAtTime(0.001, now);
+      subGain.gain.linearRampToValueAtTime(isPower ? 0.28 : 0.18, now + 0.006);
+      subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+      sub.connect(subGain).connect(ac.destination);
+      sub.start(now);
+      sub.stop(now + 0.13);
+
+      const ping = ac.createOscillator();
+      const pGain = ac.createGain();
+      ping.type = 'triangle';
+      ping.frequency.setValueAtTime(isPower ? 680 : 510, now);
+      ping.frequency.exponentialRampToValueAtTime(195, now + 0.13);
+      pGain.gain.setValueAtTime(0.001, now);
+      pGain.gain.linearRampToValueAtTime(isPower ? 0.16 : 0.11, now + 0.005);
+      pGain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+      ping.connect(pGain).connect(ac.destination);
+      ping.start(now);
+      ping.stop(now + 0.15);
+
+      if (isPower) {
+        const chord = [523.25, 659.25, 783.99, 1046.5];
+        chord.forEach((freq, i) => {
+          const t0 = now + i * 0.024;
+          const cOsc = ac.createOscillator();
+          const cGain = ac.createGain();
+          cOsc.type = 'sine';
+          cOsc.frequency.setValueAtTime(freq, t0);
+          cGain.gain.setValueAtTime(0.001, t0);
+          cGain.gain.linearRampToValueAtTime(0.07, t0 + 0.006);
+          cGain.gain.exponentialRampToValueAtTime(0.0008, t0 + 0.18);
+          cOsc.connect(cGain).connect(ac.destination);
+          cOsc.start(t0);
+          cOsc.stop(t0 + 0.19);
+        });
+      }
+    }
+
+    function playRacketSpeakerSfx(type = 'swing', speed = 1.0) {
+      const ac = ensureAudio();
+      if (!ac) return;
+      const now = ac.currentTime;
+
+      if (type === 'toss') {
+        const osc = ac.createOscillator();
+        const gain = ac.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(320, now);
+        osc.frequency.exponentialRampToValueAtTime(760, now + 0.16);
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.linearRampToValueAtTime(0.09, now + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+        osc.connect(gain).connect(ac.destination);
+        osc.start(now);
+        osc.stop(now + 0.19);
+        return;
+      }
+
+      const bufLen = Math.floor(ac.sampleRate * 0.14);
+      const noiseBuf = ac.createBuffer(1, bufLen, ac.sampleRate);
+      const data = noiseBuf.getChannelData(0);
+      for (let i = 0; i < bufLen; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.sin((i / bufLen) * Math.PI);
+      }
+      const noise = ac.createBufferSource();
+      noise.buffer = noiseBuf;
+      const filter = ac.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(480, now);
+      filter.frequency.exponentialRampToValueAtTime(1400 * Math.min(1.6, Math.max(0.7, speed)), now + 0.12);
+      filter.Q.value = 1.8;
+
+      const nGain = ac.createGain();
+      nGain.gain.setValueAtTime(0.001, now);
+      nGain.gain.linearRampToValueAtTime(0.11, now + 0.02);
+      nGain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+      noise.connect(filter).connect(nGain).connect(ac.destination);
+      noise.start(now);
+
+      const ping = ac.createOscillator();
+      const pGain = ac.createGain();
+      ping.type = 'triangle';
+      ping.frequency.setValueAtTime(520 * Math.min(1.35, Math.max(0.85, speed)), now + 0.03);
+      ping.frequency.exponentialRampToValueAtTime(290, now + 0.14);
+      pGain.gain.setValueAtTime(0.001, now);
+      pGain.gain.linearRampToValueAtTime(0.1, now + 0.04);
+      pGain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+      ping.connect(pGain).connect(ac.destination);
+      ping.start(now + 0.03);
+      ping.stop(now + 0.16);
+    }
+
+    function flashLeds() {
+      const activeIdx = state.role === 'p2' ? 1 : 0;
+      leds.forEach((led, idx) => {
+        setTimeout(() => {
+          led.classList.add('on');
+          if (idx !== activeIdx) {
+            setTimeout(() => led.classList.remove('on'), 180);
+          }
+        }, idx * 40);
+      });
+    }
+
+    function triggerVisualSwingPulse(speed = 1.15, angleX = 0, isToss = false, side = 'forehand', shotType = 'topspin', dirY = -0.45) {
+      state.stringVibAmp = Math.min(9.0, 4.0 * speed);
+      state.swingKickX = isToss ? 18 : (shotType === 'smash' ? -26 : -20) * Math.min(1.5, speed);
+      const sideSign = side === 'backhand' ? 1 : -1;
+      state.swingKickY = isToss ? 0 : sideSign * 22 * Math.min(1.4, speed);
+      state.swingKickZ = isToss ? 0 : -sideSign * 16 * Math.min(1.3, speed);
+
+      state.lastSwingArc = {
+        side,
+        shotType: isToss ? 'lob' : shotType,
+        isToss,
+        angleX,
+        dirY,
+        speed,
+        t: performance.now(),
+      };
+
+      racketHead.classList.add('swing-flash');
+      swingAura.style.opacity = '0.9';
+      setTimeout(() => {
+        racketHead.classList.remove('swing-flash');
+        swingAura.style.opacity = '0.15';
+      }, 240);
+
+      const cx = canvas.width * 0.5 + (state.roll / 90) * 65;
+      const cy = canvas.height * 0.5 - (state.pitch / 90) * 65;
+      state.impactRings.push({
+        x: cx,
+        y: cy,
+        r: 12,
+        maxR: isToss ? 95 : 135,
+        alpha: 0.95,
+        color: isToss ? '#38bdf8' : shotType === 'smash' ? '#ff9f1c' : shotType === 'slice' ? '#38bdf8' : '#dfff00',
+      });
+    }
+
+    function handleIncomingGameFeedback(fb) {
+      if (!fb || typeof fb.seq !== 'number') return;
+      if (state.lastFeedbackSeq === -1) {
+        const age = Date.now() - Number(fb.serverTimeMs || 0);
+        state.lastFeedbackSeq = fb.seq;
+        if (age > 650) return;
+      } else if (fb.seq <= state.lastFeedbackSeq) {
+        return;
+      }
+      state.lastFeedbackSeq = fb.seq;
+
+      const kind = String(fb.kind || 'hit');
+      const grade = String(fb.grade || 'GOOD');
+      const speedKmh = Number(fb.speedKmh || 0);
+      const isPower = /PERFECT|POWER|SMASH|ACE/i.test(grade) || Number(fb.intensity || 1) >= 1.25;
+
+      triggerDeviceHaptic(
+        kind === 'whiff' || kind === 'fault'
+          ? 'whiff'
+          : kind === 'point_won'
+          ? 'point_won'
+          : isPower
+          ? 'power_hit'
+          : 'hit',
+        Number(fb.intensity || 1.0)
+      );
+      playImpactHapticAudio(fb);
+      flashLeds();
+
+      const cx = canvas.width * 0.5 + (state.roll / 90) * 65;
+      const cy = canvas.height * 0.5 - (state.pitch / 90) * 65;
+      state.impactRings.push({
+        x: cx,
+        y: cy,
+        r: 12,
+        maxR: isPower ? 150 : 105,
+        alpha: 1.0,
+        color: kind === 'whiff' || kind === 'fault' ? '#ff6b6b' : isPower ? '#dfff00' : '#38bdf8',
+      });
+      state.stringVibAmp = isPower ? 8.5 : 4.5;
+
+      const activeSide = fb.side
+        ? String(fb.side).toUpperCase()
+        : state.lastSwingArc && state.lastSwingArc.side
+        ? state.lastSwingArc.side.toUpperCase()
+        : '';
+      const activeShot = fb.shotType
+        ? String(fb.shotType).toUpperCase()
+        : state.lastSwingArc && state.lastSwingArc.shotType
+        ? state.lastSwingArc.shotType.toUpperCase()
+        : '';
+      const descriptor = [activeSide, activeShot].filter(Boolean).join(' ');
+
+      if (kind === 'whiff') {
+        shotCallout.textContent = `WHIFF • SWUNG TOO ${grade.includes('LATE') ? 'LATE' : 'EARLY'}`;
+      } else if (speedKmh > 0) {
+        shotCallout.textContent = descriptor
+          ? `🎾 ${grade} • ${descriptor} • ${speedKmh} KM/H`
+          : `🎾 ${grade} • ${speedKmh} KM/H`;
+      } else {
+        shotCallout.textContent = descriptor ? `🎾 ${grade} • ${descriptor}` : `🎾 ${grade}`;
+      }
+    }
+
+    async function sendSwingPayload(payload) {
+      const now = Date.now();
+      state.lastSwingMs = now;
+      const isToss = payload.type === 'toss';
+      const angleX = Number(payload.angleX ?? 0.0);
+      const dirY = Number(payload.dirY ?? (isToss ? -0.9 : -0.45));
+      const side = payload.side || (angleX > 0.1 ? 'backhand' : 'forehand');
+      const shotType = payload.shotType || (isToss ? 'lob' : 'topspin');
+      const speed = Number(payload.speed || 1.0);
+
+      triggerDeviceHaptic(isToss ? 'toss' : 'swing', speed);
+      playRacketSpeakerSfx(payload.type || 'swing', speed);
+      flashLeds();
+      triggerVisualSwingPulse(speed, angleX, isToss, side, shotType, dirY);
+
+      const body = {
+        room: state.roomId,
+        role: state.role,
+        type: payload.type || 'swing',
+        side,
+        shotType,
+        speed,
+        angleX,
+        dirX: angleX,
+        dirY,
+        pitch: Number(state.pitch || 0.0),
+        roll: Number(state.roll || 0.0),
+        yaw: Number(state.yaw || 0.0),
+        timestamp: now,
+        source: 'phone',
+      };
+
+      const sideLabel = side === 'backhand' ? 'BACKHAND' : 'FOREHAND';
+      const shotLabelMap = {
+        topspin: 'TOPSPIN',
+        slice: 'SLICE',
+        lob: 'LOB',
+        smash: 'POWER SMASH',
+        flat: 'FLAT DRIVE',
+      };
+      const shotIconMap = {
+        topspin: '🔥',
+        slice: '⚡',
+        lob: '🌈',
+        smash: '💥',
+        flat: '⚡',
+      };
+      const shotLabel = shotLabelMap[body.shotType] || body.shotType.toUpperCase();
+      const shotIcon = shotIconMap[body.shotType] || '⚡';
+      const estKmh = Math.round(body.speed * 118);
+
+      shotCallout.textContent = isToss
+        ? `🎾 SERVE TOSS / ${sideLabel} LOB • ${estKmh} KM/H`
+        : `${shotIcon} ${sideLabel} ${shotLabel} • ${estKmh} KM/H`;
+
+      try {
+        const res = await fetch(`/api/racket/swing?room=${encodeURIComponent(state.roomId)}&role=${encodeURIComponent(state.role)}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          state.seq = data.seq || state.seq + 1;
+          connDot.classList.remove('offline');
+          const roomTag = state.roomId !== 'default' ? ` • ${state.roomId.toUpperCase()}` : '';
+          connText.textContent = `${state.role.toUpperCase()} RACKET${roomTag} • #${state.seq}`;
+          if (data.lastFeedback) {
+            handleIncomingGameFeedback(data.lastFeedback);
+          }
+        }
+      } catch (_) {
+        connDot.classList.add('offline');
+        connText.textContent = 'POCKET RACKET • RETRYING';
+      }
+    }
+
+    // 15Hz live telemetry & bidirectional impact feedback sync
+    setInterval(async () => {
+      try {
+        const res = await fetch(`/api/racket/telemetry?room=${encodeURIComponent(state.roomId)}&role=${encodeURIComponent(state.role)}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            room: state.roomId,
+            role: state.role,
+            pitch: state.pitch,
+            roll: state.roll,
+            yaw: state.yaw,
+            accelMag: state.accelMag,
+            connected: true,
+          }),
+        });
+        if (res.ok) {
+          connDot.classList.remove('offline');
+          const data = await res.json();
+          if (data && data.lastFeedback) {
+            handleIncomingGameFeedback(data.lastFeedback);
+          }
+        }
+      } catch (_) {
+        connDot.classList.add('offline');
+      }
+    }, 60);
+
+    // Touch / Swipe gesture on the racket itself (also enables gyro if tapped!)
+    let pointerStart = null;
+    function getCanvasPos(e) {
+      const rect = canvas.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      return {
+        x: ((clientX - rect.left) / rect.width) * canvas.width,
+        y: ((clientY - rect.top) / rect.height) * canvas.height,
+        t: performance.now(),
+      };
+    }
+
+    function onPadDown(e) {
+      e.preventDefault();
+      ensureAudio();
+      const p = getCanvasPos(e);
+      pointerStart = p;
+      state.swipeTrail = [p];
+    }
+
+    function onPadMove(e) {
+      if (!pointerStart) return;
+      e.preventDefault();
+      const p = getCanvasPos(e);
+      state.swipeTrail.push(p);
+      if (state.swipeTrail.length > 22) state.swipeTrail.shift();
+
+      if (!state.motionEnabled) {
+        state.roll = ((p.x / canvas.width) - 0.5) * 65;
+        state.pitch = (0.5 - (p.y / canvas.height)) * 65;
+        tiltReadout.textContent = `${state.pitch.toFixed(0)}° / ${state.roll.toFixed(0)}°`;
+      }
+    }
+
+    function onPadUp(e) {
+      if (!pointerStart) return;
+      e.preventDefault();
+      const startPos = pointerStart;
+      const last = state.swipeTrail[state.swipeTrail.length - 1] || startPos;
+      const dx = last.x - startPos.x;
+      const dy = last.y - startPos.y;
+      const dt = Math.max(16, last.t - startPos.t);
+      const dist = Math.hypot(dx, dy);
+      const vel = (dist / dt) * 1.1;
+      pointerStart = null;
+
+      if (dist < 14) {
+        const tapSide = startPos.x < canvas.width * 0.48 || state.roll < -14 ? 'backhand' : 'forehand';
+        const tapAngleX = tapSide === 'backhand' ? 0.35 : -0.35;
+        let tapShotType = 'topspin';
+        let tapDirY = -0.45;
+        if (startPos.y < canvas.height * 0.25) {
+          tapShotType = 'smash';
+          tapDirY = 0.55;
+        } else if (startPos.y > canvas.height * 0.78) {
+          tapShotType = 'lob';
+          tapDirY = -0.85;
+        }
+        sendSwingPayload({
+          type: 'swing',
+          side: tapSide,
+          shotType: tapShotType,
+          speed: tapShotType === 'smash' ? 1.38 : 1.15,
+          angleX: tapAngleX,
+          dirY: tapDirY,
+        });
+        return;
+      }
+
+      // 1. Determine Swing Side ('forehand' | 'backhand') from touch-flick direction
+      let side = 'forehand';
+      if (dx > 12) {
+        side = 'backhand';
+      } else if (dx < -12) {
+        side = 'forehand';
+      } else {
+        side = startPos.x < canvas.width * 0.48 ? 'backhand' : 'forehand';
+      }
+
+      const rawNormX = Math.max(-1, Math.min(1, dx / 110));
+      const normX =
+        side === 'backhand'
+          ? Math.max(0.25, Math.min(1.0, Math.abs(rawNormX) > 0.2 ? Math.abs(rawNormX) : 0.35))
+          : Math.min(-0.25, Math.max(-1.0, Math.abs(rawNormX) > 0.2 ? -Math.abs(rawNormX) : -0.35));
+      const normY = Math.max(-1, Math.min(1, dy / 95));
+      const speed = Math.max(0.82, Math.min(1.65, 0.85 + vel * 0.45));
+
+      // 2. Determine Shot Type ('topspin' | 'slice' | 'lob' | 'smash') & Toss vs Swing
+      if (dy < -42 && Math.abs(dy) > Math.abs(dx) * 1.15) {
+        // Steep upward swipe: slow/medium -> Serve Toss + Lob; fast upward scoop -> rally Lob
+        const isGentleToss = speed < 1.28;
+        sendSwingPayload({
+          type: isGentleToss ? 'toss' : 'swing',
+          side,
+          shotType: 'lob',
+          speed,
+          angleX: normX,
+          dirY: isGentleToss ? -0.9 : -0.85,
+        });
+      } else if ((dy > 40 && speed >= 1.18) || speed >= 1.45) {
+        // Fast downward smash swipe or ultra-fast swipe -> Power Smash
+        sendSwingPayload({
+          type: 'swing',
+          side,
+          shotType: 'smash',
+          speed: Math.max(1.35, speed),
+          angleX: normX,
+          dirY: Math.max(0.45, normY),
+        });
+      } else if (dy > 14 && dy <= 40) {
+        // Downward-cutting diagonal swipe -> Slice
+        sendSwingPayload({
+          type: 'swing',
+          side,
+          shotType: 'slice',
+          speed,
+          angleX: normX,
+          dirY: Math.max(0.35, normY),
+        });
+      } else {
+        // Upward-brushing or level drive swipe (dy <= 14) -> Topspin
+        sendSwingPayload({
+          type: 'swing',
+          side,
+          shotType: 'topspin',
+          speed,
+          angleX: normX,
+          dirY: Math.min(-0.25, normY),
+        });
+      }
+    }
+
+    canvas.addEventListener('pointerdown', onPadDown);
+    canvas.addEventListener('pointermove', onPadMove);
+    window.addEventListener('pointerup', onPadUp);
+
+    // 60fps Render Loop: 3D Racket Tilt + Live Gyro String-Bed Visualizer
+    function renderRacketLoop() {
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+
+      // Smooth 3D physical racket tilt & directional Forehand/Backhand swing kick
+      state.smoothPitch += (state.pitch - state.smoothPitch) * 0.22;
+      state.smoothRoll += (state.roll - state.smoothRoll) * 0.22;
+      state.swingKickX *= 0.84;
+      state.swingKickY *= 0.84;
+      state.swingKickZ *= 0.84;
+      state.accelMag *= 0.90;
+
+      const tiltX = Math.max(-26, Math.min(26, state.smoothPitch * 0.32 + state.swingKickX));
+      const tiltY = Math.max(-32, Math.min(32, state.smoothRoll * 0.36 + state.swingKickY));
+      const tiltZ = Math.max(-22, Math.min(22, -state.smoothRoll * 0.16 + state.swingKickZ));
+      const scalePop = 1.0 + Math.min(0.06, Math.abs(state.swingKickX) * 0.0025);
+      racketRig.style.transform = `rotateX(${tiltX.toFixed(2)}deg) rotateY(${tiltY.toFixed(2)}deg) rotateZ(${tiltZ.toFixed(2)}deg) scale(${scalePop.toFixed(3)})`;
+
+      // Decay string vibration amplitude
+      state.stringVibAmp *= 0.89;
+      if (state.stringVibAmp < 0.04) state.stringVibAmp = 0;
+      const vibPhase = performance.now() * 0.065;
+
+      // 1. Draw 16x19 Woven Tennis Strings with Physical Vibration
+      ctx.strokeStyle = state.stringVibAmp > 0.6 ? 'rgba(223, 255, 0, 0.46)' : 'rgba(230, 246, 255, 0.24)';
+      ctx.lineWidth = state.stringVibAmp > 0.6 ? 1.6 : 1.25;
+      ctx.beginPath();
+      for (let x = 20; x < w; x += 20) {
+        const offset = state.stringVibAmp * Math.sin(vibPhase + x * 0.09);
+        ctx.moveTo(x + offset, 0);
+        ctx.lineTo(x - offset, h);
+      }
+      for (let y = 20; y < h; y += 20) {
+        const offset = state.stringVibAmp * Math.cos(vibPhase + y * 0.09);
+        ctx.moveTo(0, y + offset);
+        ctx.lineTo(w, y - offset);
+      }
+      ctx.stroke();
+
+      // 2. Draw Subtle Pro "A" Stencil on Center Strings
+      ctx.save();
+      ctx.strokeStyle = 'rgba(223, 255, 0, 0.20)';
+      ctx.lineWidth = 6.5;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      ctx.moveTo(w * 0.5, 58);
+      ctx.lineTo(w * 0.31, h - 72);
+      ctx.moveTo(w * 0.5, 58);
+      ctx.lineTo(w * 0.69, h - 72);
+      ctx.moveTo(w * 0.37, h * 0.56);
+      ctx.lineTo(w * 0.63, h * 0.56);
+      ctx.stroke();
+      ctx.restore();
+
+      // 3. Draw Directional Swing Arc Arrow (Forehand vs Backhand + Shot Type)
+      const nowPerf = performance.now();
+      const arcAge = state.lastSwingArc ? nowPerf - state.lastSwingArc.t : 99999;
+      if (state.lastSwingArc && arcAge < 900) {
+        const fade = Math.max(0, 1 - arcAge / 900);
+        const arc = state.lastSwingArc;
+        const isBH = arc.side === 'backhand';
+        const startX = isBH ? w * 0.20 : w * 0.80;
+        const endX = isBH ? w * 0.80 : w * 0.20;
+        const dyOffset = Math.max(-55, Math.min(55, (arc.dirY || -0.4) * 58));
+        const startY = h * 0.52 - dyOffset * 0.55;
+        const endY = h * 0.46 + dyOffset * 0.65;
+        const ctrlX = w * 0.5;
+        const ctrlY = h * 0.38 + dyOffset * 0.35;
+
+        const arcColor =
+          arc.shotType === 'smash'
+            ? '#ff9f1c'
+            : arc.shotType === 'slice'
+            ? '#38bdf8'
+            : arc.shotType === 'lob'
+            ? '#a78bfa'
+            : '#dfff00';
+
+        ctx.save();
+        ctx.globalAlpha = fade * 0.92;
+        ctx.strokeStyle = arcColor;
+        ctx.fillStyle = arcColor;
+        ctx.shadowColor = arcColor;
+        ctx.shadowBlur = 14;
+        ctx.lineWidth = 5.0;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+        ctx.quadraticCurveTo(ctrlX, ctrlY, endX, endY);
+        ctx.stroke();
+
+        // Arrowhead at (endX, endY) along tangent from control point
+        const tanAngle = Math.atan2(endY - ctrlY, endX - ctrlX);
+        ctx.beginPath();
+        ctx.moveTo(endX, endY);
+        ctx.lineTo(endX - 15 * Math.cos(tanAngle - 0.48), endY - 15 * Math.sin(tanAngle - 0.48));
+        ctx.lineTo(endX - 15 * Math.cos(tanAngle + 0.48), endY - 15 * Math.sin(tanAngle + 0.48));
+        ctx.closePath();
+        ctx.fill();
+
+        // Side + Shot badge above arc
+        ctx.shadowBlur = 0;
+        ctx.font = '900 11px sans-serif';
+        ctx.textAlign = 'center';
+        const badgeText = `${isBH ? 'BACKHAND →' : '← FOREHAND'} • ${arc.shotType.toUpperCase()}`;
+        ctx.fillStyle = 'rgba(9, 18, 28, 0.85)';
+        ctx.fillRect(w * 0.5 - 78, 22, 156, 22);
+        ctx.strokeStyle = arcColor;
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(w * 0.5 - 78, 22, 156, 22);
+        ctx.fillStyle = arcColor;
+        ctx.fillText(badgeText, w * 0.5, 37);
+        ctx.restore();
+      }
+
+      // 4. Draw Expanding Impact Shockwave Rings
+      for (let i = state.impactRings.length - 1; i >= 0; i--) {
+        const ring = state.impactRings[i];
+        ring.r += (ring.maxR - ring.r) * 0.16 + 2.4;
+        ring.alpha *= 0.90;
+        if (ring.alpha <= 0.04) {
+          state.impactRings.splice(i, 1);
+          continue;
+        }
+        ctx.save();
+        ctx.strokeStyle = ring.color;
+        ctx.globalAlpha = ring.alpha;
+        ctx.lineWidth = 3.5;
+        ctx.beginPath();
+        ctx.arc(ring.x, ring.y, ring.r, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // 5. Live Gyro Comet Trail & Floating Sweet-Spot Tennis Ball
+      const ballX = Math.max(42, Math.min(w - 42, w * 0.5 + (state.smoothRoll / 75) * (w * 0.36)));
+      const ballY = Math.max(46, Math.min(h - 62, h * 0.47 - (state.smoothPitch / 75) * (h * 0.34)));
+
+      state.gyroTrail.push({ x: ballX, y: ballY });
+      if (state.gyroTrail.length > 18) state.gyroTrail.shift();
+
+      if (state.gyroTrail.length > 2) {
+        ctx.save();
+        for (let i = 1; i < state.gyroTrail.length; i++) {
+          const p0 = state.gyroTrail[i - 1];
+          const p1 = state.gyroTrail[i];
+          const frac = i / state.gyroTrail.length;
+          ctx.strokeStyle = `rgba(223, 255, 0, ${(frac * 0.55).toFixed(2)})`;
+          ctx.lineWidth = frac * 10;
+          ctx.lineCap = 'round';
+          ctx.beginPath();
+          ctx.moveTo(p0.x, p0.y);
+          ctx.lineTo(p1.x, p1.y);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      // Outer Gyro Horizon Ring + Sweet-Spot Tennis Ball
+      ctx.save();
+      ctx.translate(ballX, ballY);
+      ctx.rotate((state.smoothRoll * Math.PI) / 180);
+
+      // Dashed sweet-spot halo
+      ctx.strokeStyle = 'rgba(223, 255, 0, 0.85)';
+      ctx.lineWidth = 2.2;
+      ctx.setLineDash([6, 5]);
+      ctx.beginPath();
+      ctx.arc(0, 0, 34 + state.stringVibAmp * 1.5, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // 3D Optic-Yellow Tennis Ball with white seam
+      const ballGrad = ctx.createRadialGradient(-5, -5, 2, 0, 0, 16);
+      ballGrad.addColorStop(0, '#f9ff8c');
+      ballGrad.addColorStop(0.55, '#dfff00');
+      ballGrad.addColorStop(1, '#9bbb00');
+      ctx.fillStyle = ballGrad;
+      ctx.beginPath();
+      ctx.arc(0, 0, 15, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(-9, 0, 10, -0.8, 0.8);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(9, 0, 10, Math.PI - 0.8, Math.PI + 0.8);
+      ctx.stroke();
+      ctx.restore();
+
+      // 6. Draw Touch Swipe Trail if user swiped strings
+      if (state.swipeTrail.length > 1) {
+        ctx.save();
+        ctx.strokeStyle = '#dfff00';
+        ctx.shadowColor = '#25a8f5';
+        ctx.shadowBlur = 12;
+        ctx.lineWidth = 4.5;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(state.swipeTrail[0].x, state.swipeTrail[0].y);
+        for (let i = 1; i < state.swipeTrail.length; i++) {
+          ctx.lineTo(state.swipeTrail[i].x, state.swipeTrail[i].y);
+        }
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      requestAnimationFrame(renderRacketLoop);
+    }
+    requestAnimationFrame(renderRacketLoop);
+
+    // DeviceOrientation & DeviceMotion Gyroscope / Peak-Velocity Swing Detector
+    let swingWindowActive = false;
+    let swingPeak = { mag: 0, ax: 0, ay: 0, az: 0 };
+
+    function attachMotionListeners() {
+      if (state.motionEnabled) return;
+      state.motionEnabled = true;
+      enableMotionBtn.textContent = 'Gyro Connected ✓';
+      enableMotionBtn.classList.add('connected');
+      shotCallout.textContent = 'GYRO LIVE • SWING FOREHAND OR BACKHAND!';
+
+      window.addEventListener('deviceorientation', (e) => {
+        state.pitch = Number(e.beta || 0);
+        state.roll = Number(e.gamma || 0);
+        state.yaw = Number(e.alpha || 0);
+        recordMotionSample();
+        tiltReadout.textContent = `${state.pitch.toFixed(0)}° / ${state.roll.toFixed(0)}°`;
+      });
+
+      window.addEventListener('devicemotion', (e) => {
+        const hasLinear = e.acceleration && (e.acceleration.x !== null || e.acceleration.y !== null);
+        const acc = hasLinear ? e.acceleration : e.accelerationIncludingGravity;
+        if (!acc) return;
+
+        const ax = Number(acc.x || 0);
+        const ay = Number(acc.y || 0);
+        const az = Number(acc.z || 0);
+        const rawMag = Math.hypot(ax, ay, az);
+        const mag = hasLinear ? rawMag : Math.max(0, rawMag - 9.81);
+
+        state.accelMag = mag;
+        recordMotionSample(ax, ay, az, mag);
+        accelReadout.textContent = `${mag.toFixed(1)} m/s²`;
+        const pct = Math.min(100, Math.max(6, Math.round((mag / 25) * 100)));
+        accelBar.style.width = `${pct}%`;
+
+        const now = Date.now();
+        if (now - state.lastSwingMs < 270) return;
+
+        if (mag > 10.2) {
+          if (mag > swingPeak.mag) {
+            swingPeak = { mag, ax, ay, az };
+          }
+          if (!swingWindowActive) {
+            swingWindowActive = true;
+            setTimeout(() => {
+              swingWindowActive = false;
+              const pk = swingPeak;
+              swingPeak = { mag: 0, ax: 0, ay: 0, az: 0 };
+
+              const classified = classifyPhoneSwing(pk, state.motionHistory);
+              sendSwingPayload({
+                type: classified.type,
+                side: classified.side,
+                shotType: classified.shotType,
+                speed: classified.speed,
+                angleX: classified.angleX,
+                dirY: classified.dirY,
+              });
+            }, 28);
+          }
+        }
+      });
+    }
+
+    async function requestAndEnableGyro() {
+      ensureAudio();
+      triggerDeviceHaptic('tap', 0.8);
+      if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+        try {
+          const perm = await DeviceMotionEvent.requestPermission();
+          if (perm === 'granted') attachMotionListeners();
+        } catch (_) {
+          attachMotionListeners();
+        }
+      } else {
+        attachMotionListeners();
+      }
+    }
+
+    enableMotionBtn.addEventListener('click', requestAndEnableGyro);
+  </script>
+</body>
+</html>

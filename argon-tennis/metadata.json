@@ -1,0 +1,5 @@
+{
+  "name": "Argon Tennis",
+  "description": "Argon Tennis — 3D arcade tennis game with high-speed racket kinematics, expressive 3D characters, webcam & phone motion controls, and spatial audio.",
+  "requestFramePermissions": ["camera"]
+}

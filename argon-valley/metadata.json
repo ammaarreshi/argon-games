@@ -1,0 +1,5 @@
+{
+  "name": "Argon Valley",
+  "description": "A cozy 3D island life-simulation game built in Three.js with curved-world shaders, tactile materials, Lyria 3 music, and Gemini 3.8 Flash TTS villager voices.",
+  "requestFramePermissions": []
+}

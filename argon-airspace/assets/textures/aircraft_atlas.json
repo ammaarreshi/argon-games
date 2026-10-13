@@ -1,0 +1,169 @@
+{
+  "meta": {
+    "image": "aircraft_atlas.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 1024,
+      "h": 512
+    },
+    "cell_size": {
+      "w": 256,
+      "h": 256
+    },
+    "scale": 1
+  },
+  "frames": {
+    "plane_jet_red": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "uv": {
+        "u0": 0.0,
+        "v0": 0.0,
+        "u1": 0.25,
+        "v1": 0.5
+      },
+      "orientation": "right (+X, 0 rad)",
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "plane_prop_yellow": {
+      "frame": {
+        "x": 256,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "uv": {
+        "u0": 0.25,
+        "v0": 0.0,
+        "u1": 0.5,
+        "v1": 0.5
+      },
+      "orientation": "right (+X, 0 rad)",
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "plane_prop_blue": {
+      "frame": {
+        "x": 512,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "uv": {
+        "u0": 0.5,
+        "v0": 0.0,
+        "u1": 0.75,
+        "v1": 0.5
+      },
+      "orientation": "right (+X, 0 rad)",
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "plane_heli_blue": {
+      "frame": {
+        "x": 768,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "uv": {
+        "u0": 0.75,
+        "v0": 0.0,
+        "u1": 1.0,
+        "v1": 0.5
+      },
+      "orientation": "right (+X, 0 rad)",
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "plane_seaplane_green": {
+      "frame": {
+        "x": 0,
+        "y": 256,
+        "w": 256,
+        "h": 256
+      },
+      "uv": {
+        "u0": 0.0,
+        "v0": 0.5,
+        "u1": 0.25,
+        "v1": 1.0
+      },
+      "orientation": "right (+X, 0 rad)",
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "windsock_orange": {
+      "frame": {
+        "x": 256,
+        "y": 256,
+        "w": 256,
+        "h": 256
+      },
+      "uv": {
+        "u0": 0.25,
+        "v0": 0.5,
+        "u1": 0.5,
+        "v1": 1.0
+      },
+      "orientation": "right (+X, 0 rad)",
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "rotor_blur": {
+      "frame": {
+        "x": 512,
+        "y": 256,
+        "w": 256,
+        "h": 256
+      },
+      "uv": {
+        "u0": 0.5,
+        "v0": 0.5,
+        "u1": 0.75,
+        "v1": 1.0
+      },
+      "orientation": "right (+X, 0 rad)",
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "prop_blur": {
+      "frame": {
+        "x": 768,
+        "y": 256,
+        "w": 256,
+        "h": 256
+      },
+      "uv": {
+        "u0": 0.75,
+        "v0": 0.5,
+        "u1": 1.0,
+        "v1": 1.0
+      },
+      "orientation": "right (+X, 0 rad)",
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    }
+  }
+}

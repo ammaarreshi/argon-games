@@ -1,0 +1,1247 @@
+/* ==========================================================================
+   Argon Tennis — Playful 3D Arcade Club UI, HUD & Menu Stylesheet
+   ========================================================================== */
+
+:root {
+  --wii-font: "Rounded Mplus 1c", "Trebuchet MS", "Nunito", "Varela Round", "Arial Rounded MT Bold", system-ui, -apple-system, sans-serif;
+  --wii-cyan: #25a8f5;
+  --wii-cyan-Light: #7be0ff;
+  --wii-cyan-dark: #006cc4;
+  --wii-yellow: #ffea28;
+  --wii-gold-dark: #d98c00;
+  --wii-green: #58b828;
+  --wii-green-dark: #2c7a12;
+  --wii-hud-bg: rgba(16, 20, 26, 0.84);
+  --wii-hud-border: rgba(235, 244, 255, 0.68);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #4fa6ff;
+  font-family: var(--wii-font);
+  color: #ffffff;
+}
+
+/* Guarantee Title Modal is never visible when ?play=1 or ?state=... is active */
+html.autoplay-mode #title-modal {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ==========================================================================
+   1. 3D Viewport Canvas
+   ========================================================================== */
+#canvas-container {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  background: linear-gradient(180deg, #56abff 0%, #9fd4ff 48%, #55a224 50%, #468a1c 100%);
+}
+
+#game-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+}
+
+/* ==========================================================================
+   2. HUD Root & Top Scoreboard Bar (Matches ref_06_game_point_hud.png)
+   ========================================================================== */
+#hud-root {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+#top-hud-bar {
+  position: absolute;
+  top: 14px;
+  left: 22px;
+  right: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+/* Top-Left & Top-Right Game Counter Pills (O O) */
+.wii-games-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(48, 56, 66, 0.88) 0%, rgba(16, 20, 25, 0.9) 55%, rgba(10, 12, 16, 0.94) 100%);
+  border: 2px solid rgba(230, 238, 248, 0.72);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.45);
+}
+
+.game-bubble {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, rgba(60, 68, 78, 0.9), rgba(14, 18, 22, 0.95));
+  border: 2px solid rgba(220, 230, 242, 0.8);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.7);
+  transition: transform 0.25s cubic-bezier(0.2, 1.3, 0.4, 1), background 0.25s ease;
+}
+
+.game-bubble.won {
+  background: radial-gradient(circle at 32% 30%, #ffff7a 0%, #dfff00 55%, #99b800 100%);
+  border-color: #ffffff;
+  box-shadow: 0 0 8px rgba(223, 255, 0, 0.8), inset 0 -2px 3px rgba(100, 120, 0, 0.6);
+  transform: scale(1.08);
+}
+
+/* Top-Center Scoreboard Pill */
+.wii-scoreboard-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 404px;
+  height: 56px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: linear-gradient(
+    180deg,
+    rgba(64, 72, 82, 0.9) 0%,
+    rgba(28, 33, 40, 0.92) 46%,
+    rgba(14, 17, 22, 0.95) 52%,
+    rgba(22, 26, 32, 0.93) 100%
+  );
+  border: 2.5px solid rgba(235, 242, 250, 0.82);
+  box-shadow:
+    0 5px 16px rgba(0, 0, 0, 0.5),
+    inset 0 2px 2px rgba(255, 255, 255, 0.42),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.mii-side {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.mii-avatar-badge {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.48));
+}
+
+.mii-avatar-badge.secondary-mii {
+  width: 42px;
+  height: 42px;
+  opacity: 0.98;
+}
+
+.mii-avatar-badge.player-tint {
+  background: radial-gradient(circle at 50% 52%, rgba(255, 102, 68, 0.62) 0%, rgba(235, 50, 28, 0.14) 72%, rgba(255, 60, 30, 0.0) 100%);
+}
+
+.mii-avatar-badge.opponent-tint {
+  background: radial-gradient(circle at 50% 52%, rgba(88, 142, 255, 0.6) 0%, rgba(43, 92, 255, 0.14) 72%, rgba(43, 92, 255, 0.0) 100%);
+}
+
+.mii-avatar-badge canvas,
+.mii-avatar-badge .wii-mii-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+canvas.mii-canvas-backed {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.mii-avatar-badge.opponent-ready {
+  box-shadow: 0 0 0 2.5px #4ade80, 0 0 10px rgba(74, 222, 128, 0.7);
+}
+
+/* Subtle 1v1 Opponent Presence Pill beneath Top Scoreboard */
+.opponent-presence-pill {
+  position: absolute;
+  top: 72px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: rgba(16, 22, 30, 0.82);
+  border: 1.5px solid rgba(255, 255, 255, 0.28);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: rgba(240, 246, 255, 0.92);
+  backdrop-filter: blur(6px);
+  transition: all 0.25s ease;
+  pointer-events: none;
+}
+
+.opponent-presence-pill.ready {
+  background: rgba(12, 36, 22, 0.88);
+  border-color: rgba(74, 222, 128, 0.68);
+  color: #dcffe8;
+  box-shadow: 0 4px 14px rgba(34, 197, 94, 0.28);
+}
+
+.opponent-presence-pill.just-joined {
+  animation: presenceJoinPop 0.75s cubic-bezier(0.2, 1.35, 0.4, 1);
+}
+
+.opponent-presence-pill.in-rally {
+  opacity: 0.55;
+  transform: translateX(-50%) scale(0.92);
+}
+
+.presence-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #fbbf24;
+  box-shadow: 0 0 6px rgba(251, 191, 36, 0.8);
+  animation: presenceWaitPulse 1.6s infinite ease-in-out;
+}
+
+.opponent-presence-pill.ready .presence-dot {
+  background: #4ade80;
+  box-shadow: 0 0 8px #4ade80;
+  animation: none;
+}
+
+@keyframes presenceWaitPulse {
+  0%, 100% { opacity: 0.45; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+@keyframes presenceJoinPop {
+  0% { transform: translateX(-50%) scale(0.86); }
+  45% { transform: translateX(-50%) scale(1.1); }
+  100% { transform: translateX(-50%) scale(1); }
+}
+
+.score-center-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-width: 165px;
+  padding: 0 12px;
+  font-size: 31px;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  color: #ffffff;
+  text-shadow:
+    0 2px 0 #0b0e12,
+    0 -1px 0 #0b0e12,
+    2px 0 0 #0b0e12,
+    -2px 0 0 #0b0e12,
+    0 3px 6px rgba(0, 0, 0, 0.75);
+}
+
+.score-center-display.deuce-mode {
+  font-size: 27px;
+  color: #fff35c;
+}
+
+.score-dash {
+  opacity: 0.9;
+  font-weight: 800;
+}
+
+/* ==========================================================================
+   3. 3D-Projected Floating World Labels ("Server", Court Nameplates, Timing)
+   ========================================================================== */
+#world-labels-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Iconic Yellow "Server" Box above Server Mii's head (ref_06_game_point_hud.png) */
+.wii-server-tag {
+  position: absolute;
+  left: 50%;
+  top: 56%;
+  transform: translate(-50%, -100%);
+  padding: 3px 18px 4px;
+  border-radius: 5px;
+  background: linear-gradient(180deg, #fff854 0%, #ffea19 55%, #edd000 100%);
+  border: 2px solid #332b00;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  z-index: 12;
+  will-change: left, top;
+}
+
+.wii-server-tag::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -7px;
+  transform: translateX(-50%);
+  border-width: 7px 6px 0 6px;
+  border-style: solid;
+  border-color: #332b00 transparent transparent transparent;
+}
+
+.server-tag-text {
+  display: block;
+  font-size: 19px;
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+  color: #1c1700;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+/* Optional Argon Tennis Court Nameplate at Player's Feet */
+.wii-court-nameplate {
+  position: absolute;
+  left: 50%;
+  top: 78%;
+  transform: translate(-50%, 0);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 12px 3px 5px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(32, 148, 245, 0.92) 0%, rgba(12, 98, 196, 0.95) 100%);
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.45);
+}
+
+.wii-court-nameplate canvas,
+.wii-court-nameplate .wii-mii-svg {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+  display: block;
+}
+
+.plate-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+}
+
+.plate-name {
+  font-size: 13px;
+  font-weight: 900;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.plate-skill {
+  font-size: 10px;
+  font-weight: 800;
+  color: #e2f4ff;
+}
+
+/* Floating Timing & Shot Speed Popup */
+.wii-timing-popup {
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  transform: translate(-50%, -100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 5px 14px;
+  border-radius: 10px;
+  background: rgba(14, 18, 24, 0.84);
+  border: 2px solid rgba(255, 255, 255, 0.78);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  animation: popupFloat 0.22s ease-out;
+  z-index: 15;
+}
+
+@keyframes popupFloat {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -70%) scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -100%) scale(1);
+  }
+}
+
+.timing-grade {
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  color: #ffea28;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+}
+
+.timing-grade.grade-early {
+  color: #5ee6ff;
+}
+
+.timing-grade.grade-perfect {
+  color: #ffea28;
+}
+
+.timing-grade.grade-late {
+  color: #ff9c42;
+}
+
+.timing-detail {
+  font-size: 11px;
+  font-weight: 800;
+  color: #ffffff;
+  opacity: 0.95;
+}
+
+/* ==========================================================================
+   4. Glossy Center Callout Banner ("Start", "Game Point", "15 - 00", "Game!")
+   ========================================================================== */
+.center-banner-layer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 43%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.center-banner-streak {
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  height: 76px;
+  background: radial-gradient(
+    ellipse 55% 50% at 50% 50%,
+    rgba(255, 255, 240, 0.28) 0%,
+    rgba(255, 248, 200, 0.12) 55%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  border: none;
+  z-index: -1;
+}
+
+.center-banner-text {
+  font-size: clamp(50px, 6.4vw, 78px);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  line-height: 1.05;
+  text-align: center;
+  padding: 4px 28px;
+  animation: bannerPopIn 0.26s cubic-bezier(0.2, 1.35, 0.4, 1);
+}
+
+@keyframes bannerPopIn {
+  from {
+    opacity: 0;
+    transform: scale(0.76);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Gold "Game Point" / "Match Point" Callout (matches ref_06_game_point_hud.png) */
+.center-banner-text.style-gold {
+  color: #ffea19;
+  background: linear-gradient(180deg, #ffff6b 0%, #ffdf14 52%, #e09600 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter:
+    drop-shadow(0 3px 0 #261a00)
+    drop-shadow(0 -2px 0 #261a00)
+    drop-shadow(3px 0 0 #261a00)
+    drop-shadow(-3px 0 0 #261a00)
+    drop-shadow(0 6px 12px rgba(0, 0, 0, 0.55));
+}
+
+/* Glossy Cyan "Start" Callout (matches ref_02_match_start.png) */
+.center-banner-text.style-start {
+  color: #29a9f8;
+  background: linear-gradient(180deg, #8ae4ff 0%, #24a4f5 50%, #0062bd 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter:
+    drop-shadow(0 3px 0 #ffffff)
+    drop-shadow(0 -3px 0 #ffffff)
+    drop-shadow(3px 0 0 #ffffff)
+    drop-shadow(-3px 0 0 #ffffff)
+    drop-shadow(0 6px 14px rgba(0, 35, 75, 0.65));
+}
+
+/* White/Silver Score & Nice Shot Callout */
+.center-banner-text.style-score {
+  color: #ffffff;
+  background: linear-gradient(180deg, #ffffff 0%, #e4f3ff 55%, #a8d4ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter:
+    drop-shadow(0 3px 0 #122030)
+    drop-shadow(0 -2px 0 #122030)
+    drop-shadow(3px 0 0 #122030)
+    drop-shadow(-3px 0 0 #122030)
+    drop-shadow(0 6px 14px rgba(0, 0, 0, 0.55));
+}
+
+/* Fault / Out Callout */
+.center-banner-text.style-fault {
+  color: #ff6e40;
+  background: linear-gradient(180deg, #ffd180 0%, #ff6e40 55%, #c62828 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter:
+    drop-shadow(0 3px 0 #260800)
+    drop-shadow(0 -2px 0 #260800)
+    drop-shadow(3px 0 0 #260800)
+    drop-shadow(-3px 0 0 #260800)
+    drop-shadow(0 6px 14px rgba(0, 0, 0, 0.55));
+}
+
+.center-banner-sub {
+  margin-top: 4px;
+  padding: 3px 16px;
+  border-radius: 999px;
+  background: rgba(14, 18, 24, 0.8);
+  border: 1.5px solid rgba(255, 255, 255, 0.65);
+  font-size: 15px;
+  font-weight: 800;
+  color: #fff88c;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* ==========================================================================
+   5. Bottom-Left Replay Badge (Matches ref_05_net_closeup_crowd.png)
+   ========================================================================== */
+.wii-replay-badge {
+  position: absolute;
+  bottom: 24px;
+  left: 22px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 26px 6px 14px;
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    rgba(22, 26, 30, 0.92) 0%,
+    rgba(22, 26, 30, 0.82) 72%,
+    rgba(22, 26, 30, 0.15) 100%
+  );
+  border-left: 3px solid #ffca28;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.45);
+  z-index: 18;
+}
+
+.replay-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.replay-dots .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ffca28;
+  box-shadow: 0 0 5px rgba(255, 202, 40, 0.85);
+  animation: replayDotPulse 1.05s infinite ease-in-out;
+}
+
+.replay-dots .dot-2 {
+  animation-delay: 0.18s;
+  background: #ffd95a;
+}
+
+.replay-dots .dot-3 {
+  animation-delay: 0.36s;
+  background: #fff176;
+}
+
+@keyframes replayDotPulse {
+  0%, 100% {
+    opacity: 0.45;
+    transform: scale(0.88);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.18);
+  }
+}
+
+.replay-label {
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  color: #ffffff;
+  text-shadow: 0 2px 3px rgba(0, 0, 0, 0.85);
+}
+
+/* ==========================================================================
+   6. Bottom Corner Control Docks (Compact, Non-Occluding)
+   ========================================================================== */
+.hud-corner-dock {
+  position: absolute;
+  bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  pointer-events: auto;
+  z-index: 14;
+}
+
+.bottom-left-dock {
+  left: 18px;
+}
+
+body.replay-mode .bottom-left-dock {
+  bottom: 66px;
+  opacity: 0.72;
+}
+
+.bottom-right-dock {
+  right: 18px;
+  align-items: flex-end;
+}
+
+/* Keep canonical reference state captures ultra-clean on court corners */
+html[data-url-state="serve"] .hud-corner-dock,
+html[data-url-state="gamepoint"] .hud-corner-dock,
+html[data-url-state="replay"] .hud-corner-dock {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.dock-pill-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hud-mini-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: rgba(16, 20, 26, 0.78);
+  border: 1.5px solid rgba(230, 240, 255, 0.55);
+  color: #ffffff;
+  font-family: var(--wii-font);
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  transition: background 0.15s ease, transform 0.12s ease, border-color 0.15s ease;
+}
+
+.hud-mini-btn:hover {
+  background: rgba(32, 42, 56, 0.92);
+  border-color: #7be0ff;
+  transform: translateY(-1px);
+}
+
+.btn-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #8a99ad;
+}
+
+.btn-dot.music-on,
+.btn-dot.active {
+  background: #4eff7a;
+  box-shadow: 0 0 6px #4eff7a;
+}
+
+/* Timing Gauge Card */
+.timing-gauge-card {
+  width: 224px;
+  padding: 6px 10px 8px;
+  border-radius: 12px;
+  background: rgba(16, 20, 26, 0.8);
+  border: 1.5px solid rgba(235, 244, 255, 0.6);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+}
+
+.gauge-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  color: #d6ecff;
+  margin-bottom: 4px;
+}
+
+#gauge-speed-readout {
+  color: #ffea28;
+}
+
+.timing-bar-track {
+  position: relative;
+  height: 15px;
+  border-radius: 999px;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1fr 1.15fr 1fr;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  background: #10151c;
+}
+
+.timing-zone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8.5px;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+}
+
+.zone-early {
+  background: linear-gradient(90deg, #1b76c4, #28a9e0);
+}
+
+.zone-sweet {
+  background: linear-gradient(90deg, #4ec928, #ffe619, #4ec928);
+  color: #161800;
+  text-shadow: none;
+}
+
+.zone-late {
+  background: linear-gradient(90deg, #e68a19, #d94625);
+}
+
+.timing-cursor {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 5px;
+  border-radius: 3px;
+  background: #ffffff;
+  border: 1px solid #000000;
+  box-shadow: 0 0 6px #ffffff;
+  transform: translateX(-50%);
+  transition: left 0.06s linear;
+}
+
+/* Webcam Motion PiP */
+.motion-controls-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.motion-buttons-col {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.webcam-pip-card {
+  position: relative;
+  width: 132px;
+  height: 96px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #0d1218;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+#webcam-video,
+#webcam-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1);
+}
+
+.pip-badge {
+  position: absolute;
+  left: 6px;
+  bottom: 5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(10, 14, 18, 0.82);
+  font-size: 9.5px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.pip-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4eff7a;
+  box-shadow: 0 0 5px #4eff7a;
+}
+
+/* ==========================================================================
+   7. Argon Tennis Title Screen & Match Setup Modal
+   ========================================================================== */
+.wii-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: radial-gradient(circle at 50% 35%, rgba(255, 255, 255, 0.82) 0%, rgba(210, 235, 255, 0.72) 55%, rgba(16, 36, 58, 0.65) 100%);
+  backdrop-filter: blur(5px);
+}
+
+.wii-title-card {
+  width: min(520px, 94vw);
+  max-height: 92vh;
+  overflow-y: auto;
+  border-radius: 26px;
+  padding: 22px 26px 22px;
+  background:
+    linear-gradient(180deg, #ffffff 0%, #f5faff 76%, #e4f2ff 100%);
+  border: 4px solid #63bfff;
+  box-shadow:
+    0 18px 48px rgba(0, 32, 72, 0.38),
+    inset 0 2px 0 #ffffff;
+  color: #243242;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.wii-logo-header {
+  text-align: center;
+}
+
+.argon-logo-title {
+  font-size: clamp(32px, 4.4vw, 44px);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1.02;
+  filter: drop-shadow(0 3px 0 rgba(16, 56, 96, 0.14));
+}
+
+.logo-word-argon {
+  color: #1e324a;
+  margin-right: 6px;
+}
+
+.logo-word-tennis {
+  color: #169bf0;
+  font-style: italic;
+  text-shadow: 0 3px 0 #bfe6ff;
+}
+
+/* Mini Green Turf Court Position Diagram */
+.court-preview-diagram {
+  background: linear-gradient(180deg, #74c63b 0%, #56a324 100%);
+  border-radius: 16px;
+  padding: 9px 16px;
+  border: 3px solid #ffffff;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.22), 0 4px 12px rgba(0, 60, 15, 0.18);
+}
+
+.mini-court-turf {
+  position: relative;
+  height: 72px;
+  border: 2.5px solid rgba(255, 255, 255, 0.92);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+}
+
+.mini-court-lines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.mini-net-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 3px;
+  background: rgba(255, 255, 255, 0.95);
+  transform: translateX(-50%);
+}
+
+.court-slot-marker {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px 4px 6px;
+  border-radius: 999px;
+  background: rgba(16, 22, 28, 0.82);
+  border: 2px solid #ffffff;
+  color: #ffffff;
+}
+
+.court-slot-marker canvas,
+.court-slot-marker .wii-mii-svg {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: block;
+}
+
+.slot-tag {
+  font-size: 12.5px;
+  font-weight: 900;
+}
+
+.you-tag {
+  color: #ffea28;
+}
+
+.cpu-tag {
+  color: #b8dcff;
+}
+
+/* Match Mode & Length Buttons */
+.setup-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.wii-green-btn-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 9px;
+}
+
+.wii-green-choice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 8px;
+  border-radius: 13px;
+  background: linear-gradient(180deg, #74cc3d 0%, #4ea11d 100%);
+  border: 2.5px solid #c8f29e;
+  color: #ffffff;
+  font-family: var(--wii-font);
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  transition: transform 0.14s ease, box-shadow 0.14s ease, border-color 0.14s ease;
+}
+
+.wii-green-choice.selected {
+  border-color: #ffea28;
+  box-shadow: 0 0 0 3px #25a8f5, 0 5px 12px rgba(0, 80, 160, 0.32);
+  transform: translateY(-2px);
+}
+
+.choice-main {
+  font-size: 14.5px;
+  font-weight: 900;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+
+.wii-modal-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 2px;
+}
+
+.wii-ok-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-width: 240px;
+  padding: 11px 32px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #7be0ff 0%, #24a4f5 52%, #0072d6 100%);
+  border: 3px solid #ffffff;
+  box-shadow: 0 6px 18px rgba(0, 102, 204, 0.45), inset 0 2px 1px rgba(255, 255, 255, 0.65);
+  color: #ffffff;
+  font-family: var(--wii-font);
+  font-size: 19px;
+  font-weight: 900;
+  text-shadow: 0 2px 3px rgba(0, 45, 95, 0.65);
+  cursor: pointer;
+  transition: transform 0.14s ease, box-shadow 0.14s ease;
+}
+
+.wii-ok-btn:hover {
+  transform: scale(1.04);
+  box-shadow: 0 8px 24px rgba(0, 120, 235, 0.6);
+}
+
+/* ==========================================================================
+   8. Clean Phone Controller QR Dialog
+   ========================================================================== */
+.wii-dialog-box {
+  width: min(350px, 92vw);
+  padding: 22px 24px;
+  border-radius: 24px;
+  background: linear-gradient(180deg, #ffffff 0%, #f4faff 100%);
+  border: 4px solid #5cb8ff;
+  color: #1f2e3d;
+  text-align: center;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.mp-dialog-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.dialog-title {
+  font-size: 19px;
+  font-weight: 900;
+  color: #0072d6;
+  margin: 0;
+}
+
+.dialog-desc {
+  font-size: 13px;
+  font-weight: 700;
+  color: #54687d;
+  margin: -4px 0 0;
+}
+
+.mp-clean-qr-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.mp-conn-tag {
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: #e4edf7;
+  color: #4a5a6a;
+  font-size: 11.5px;
+  font-weight: 800;
+}
+
+.mp-conn-tag.online {
+  background: #d4f8df;
+  color: #127a32;
+}
+
+.mp-qr-img {
+  border-radius: 14px;
+  border: 2px solid #d0e4f8;
+  background: #ffffff;
+  padding: 6px;
+  box-shadow: 0 4px 14px rgba(0, 60, 130, 0.08);
+}
+
+.mp-subtle-link {
+  font-size: 12px;
+  font-weight: 800;
+  color: #1c7ed6;
+  text-decoration: none;
+  opacity: 0.85;
+}
+
+.mp-subtle-link:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 2px;
+}
+
+.wii-pill-btn {
+  padding: 9px 32px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #5cc4ff 0%, #168be8 100%);
+  border: 2px solid #ffffff;
+  color: #ffffff;
+  font-family: var(--wii-font);
+  font-size: 16px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 80, 170, 0.35);
+}
+
+/* Skill Level Post-Match Card */
+.wii-skill-card {
+  width: min(560px, 94vw);
+  border-radius: 22px;
+  background: rgba(28, 34, 42, 0.92);
+  border: 3px solid rgba(220, 235, 250, 0.8);
+  padding: 20px 24px;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.skill-card-header {
+  align-self: center;
+  padding: 5px 32px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #d8e2ec 0%, #99a8b8 100%);
+  color: #1f2833;
+  font-size: 18px;
+  font-weight: 900;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+.skill-card-body {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 16px;
+  align-items: center;
+}
+
+.skill-chart-frame {
+  background: #f5f9fc;
+  border-radius: 14px;
+  padding: 8px;
+  border: 3px solid #aebdca;
+}
+
+#skill-graph-canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.skill-mii-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.victory-result-banner {
+  font-size: 30px;
+  font-weight: 900;
+  color: #ffea28;
+  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
+}
+
+.skill-score-pill {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #2ca4f5 0%, #0d6ec4 100%);
+  border: 2px solid #ffffff;
+}
+
+.skill-score-pill canvas,
+.skill-score-pill .wii-mii-svg {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: block;
+}
+
+.skill-rating-number {
+  font-size: 24px;
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.skill-player-name {
+  font-size: 12px;
+  font-weight: 800;
+  color: #e2f3ff;
+}
+
+.victory-match-score {
+  font-size: 14px;
+  font-weight: 800;
+  color: #d0dfef;
+}
+
+.skill-card-footer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.wii-footer-btn {
+  padding: 11px 20px;
+  border-radius: 12px;
+  font-family: var(--wii-font);
+  font-size: 18px;
+  font-weight: 900;
+  cursor: pointer;
+  border: 2.5px solid #8ecbff;
+}
+
+.wii-footer-btn.primary {
+  background: linear-gradient(180deg, #aee4ff 0%, #52b8f5 100%);
+  color: #0c2b47;
+}
+
+.wii-footer-btn.secondary {
+  background: linear-gradient(180deg, #ffffff 0%, #dde6f0 100%);
+  color: #2c3a47;
+}

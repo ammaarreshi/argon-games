@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Argon Valley</title>
+  <meta name="description" content="A cozy 3D island life-simulation game built in Three.js with curved-world shaders, tactile materials, Lyria 3 music, and Gemini 3.8 Flash TTS villager voices." />
+  <meta property="og:title" content="Argon Valley" />
+  <meta property="og:description" content="A cozy 3D island life-simulation game built in Three.js with curved-world shaders, tactile materials, Lyria 3 music, and Gemini 3.8 Flash TTS villager voices." />
+  <script>
+    (function () {
+      const params = new URLSearchParams(window.location.search);
+      if (
+        params.get('clean') === '1' ||
+        params.get('clean') === 'true' ||
+        params.get('hud') === '0' ||
+        params.get('hud') === 'false'
+      ) {
+        document.documentElement.classList.add('clean-mode');
+      }
+    })();
+  </script>
+  <link rel="icon" href="data:," />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <!-- 3D Viewport Container -->
+  <div id="canvas-container"></div>
+
+  <!-- Argon Valley Cozy Gameplay HUD Overlay -->
+  <div id="ui-root" class="valley-hud" role="region" aria-label="Island Controls and HUD">
+    <!-- Top-Left Island Pocket & Activity Tracker Card -->
+    <aside id="pocket-panel" class="pocket-card">
+      <div class="pocket-header">
+        <span class="pocket-leaf-badge" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="18" height="18">
+            <path d="M17.5 4.5C13 4.5 6.5 7 5 14.5c-.3 1.5.2 3 1.2 4l-2 2c-.4.4-.4 1 0 1.4.4.4 1 .4 1.4 0l2-2c1.2.8 2.8 1.1 4.4.8 7.5-1.5 10-8 10-12.5 0-2-1.5-3.7-4.5-3.7zm-2.8 7.2c-1.1 1.1-2.9 1.1-4 0-.4-.4-.4-1 0-1.4s1-.4 1.4 0c.3.3.9.3 1.2 0 .4-.4 1-.4 1.4 0 .4.4.4 1 0 1.4z" fill="currentColor" />
+          </svg>
+        </span>
+        <div class="pocket-title-wrap">
+          <h1 class="pocket-title">Argon Valley Pocket</h1>
+          <span class="pocket-subtitle">Walk, Chat, Fish, Catch &amp; Craft</span>
+        </div>
+        <div class="bells-pill" title="Your Valley Coins">
+          <span class="bells-icon">💰</span>
+          <span id="inv-bells">1,500</span>
+        </div>
+        <button id="btn-collapse-pocket" class="pocket-icon-btn" title="Minimize Pocket Card (H hides all HUD)">
+          <span>–</span>
+        </button>
+      </div>
+
+      <div id="pocket-body" class="pocket-body">
+        <!-- Live Pocket Inventory & Island Activity Counters -->
+        <div class="pocket-stats-grid" id="pocket-stats-grid">
+          <div class="pocket-chip" title="Apples (Shake Apple Trees or Pick Up)">
+            <span class="chip-emoji">🍎</span>
+            <span id="inv-apple" class="chip-val">2</span>
+          </div>
+          <div class="pocket-chip" title="Oranges (Shake Orange Trees)">
+            <span class="chip-emoji">🍊</span>
+            <span id="inv-orange" class="chip-val">1</span>
+          </div>
+          <div class="pocket-chip" title="Coconuts (Shake Beach Palms)">
+            <span class="chip-emoji">🥥</span>
+            <span id="inv-coconut" class="chip-val">0</span>
+          </div>
+          <div class="pocket-chip" title="Flowers Watered (Use Watering Can [1])">
+            <span class="chip-emoji">🌷</span>
+            <span id="inv-watered" class="chip-val">0</span>
+          </div>
+          <div class="pocket-chip" title="Fish Caught (Use Fishing Rod [4] near River/Ocean)">
+            <span class="chip-emoji">🐟</span>
+            <span id="inv-fish" class="chip-val">0</span>
+          </div>
+          <div class="pocket-chip" title="Bugs Caught (Use Bug Net [5] near Butterflies)">
+            <span class="chip-emoji">🦋</span>
+            <span id="inv-bugs" class="chip-val">0</span>
+          </div>
+        </div>
+
+        <div class="pocket-section-label">Sky &amp; Time of Day</div>
+        <div class="tod-pill-row" id="tod-buttons">
+          <button class="tod-pill" data-tod="morning">🌅 Morning</button>
+          <button class="tod-pill active" data-tod="noon">☀️ Sunny Noon</button>
+          <button class="tod-pill" data-tod="golden_hour">🌇 Golden Hour</button>
+          <button class="tod-pill" data-tod="night">🌙 Starry Night</button>
+        </div>
+
+        <div class="pocket-curve-row">
+          <div class="curve-header">
+            <label for="curve-slider" class="pocket-section-label">Rolling World Curve</label>
+            <button id="btn-curve-toggle" class="curve-toggle-btn active" type="button">ON</button>
+          </div>
+          <div class="curve-slider-wrap">
+            <input
+              id="curve-slider"
+              type="range"
+              min="0"
+              max="0.022"
+              step="0.0005"
+              value="0.0115"
+              aria-label="World Curve Strength"
+            />
+            <span id="curve-value-label" class="curve-val">0.0115</span>
+          </div>
+        </div>
+
+        <!-- Optional Collapsible Fast-Travel / Postcard Views Drawer -->
+        <details class="fast-travel-drawer">
+          <summary class="fast-travel-summary">📍 Fast-Travel &amp; Postcard Views</summary>
+          <div class="scene-preset-grid" id="scene-preset-buttons">
+            <button class="scene-pill free-roam-pill active" data-preset="free_roam" data-index="0">
+              <span class="pill-num">🚶</span>
+              <span class="pill-text">Explore Island (Free Roam)</span>
+            </button>
+            <button class="scene-pill" data-preset="beach_sunset" data-index="1">
+              <span class="pill-num">🏖️</span>
+              <span class="pill-text">Sunset Beach</span>
+            </button>
+            <button class="scene-pill" data-preset="house_yard" data-index="2">
+              <span class="pill-num">🏡</span>
+              <span class="pill-text">Cottage Yard</span>
+            </button>
+            <button class="scene-pill" data-preset="flower_river" data-index="3">
+              <span class="pill-num">🌷</span>
+              <span class="pill-text">Flower River</span>
+            </button>
+            <button class="scene-pill" data-preset="tent_horizon" data-index="4">
+              <span class="pill-num">⛺</span>
+              <span class="pill-text">Tent Camp</span>
+            </button>
+            <button class="scene-pill" data-preset="bridge_plaza" data-index="5">
+              <span class="pill-num">🌉</span>
+              <span class="pill-text">Bridge &amp; Plaza</span>
+            </button>
+            <button class="scene-pill" data-preset="cliff_waterfall" data-index="6">
+              <span class="pill-num">🌊</span>
+              <span class="pill-text">Cliff Waterfall</span>
+            </button>
+          </div>
+        </details>
+      </div>
+    </aside>
+
+    <!-- Top-Center Celebratory Toast / Catch Banner -->
+    <div id="island-toast-banner" class="island-toast-banner hidden" role="status" aria-live="polite">
+      <span id="toast-icon" class="toast-icon">🍎</span>
+      <span id="toast-text" class="toast-text">Picked up a crisp Red Apple!</span>
+    </div>
+
+    <!-- Floating 3D-Tracked Contextual Action Prompt Pill -->
+    <button id="context-prompt-pill" class="context-prompt-pill hidden" type="button">
+      <span id="prompt-key-badge" class="prompt-key-badge">E</span>
+      <span id="prompt-label-text" class="prompt-label-text">Talk to Barnaby 💬</span>
+    </button>
+
+    <!-- Bottom-Left Authentic Argon Valley Clock, Date & Controls Hint -->
+    <div id="valley-clock-hud" class="valley-clock-hud">
+      <div class="clock-top-row">
+        <span id="valley-weather-icon" class="weather-icon" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="28" height="28">
+            <circle cx="16" cy="16" r="8" fill="#ffd95e" />
+            <g stroke="#ffd95e" stroke-width="2.6" stroke-linecap="round">
+              <line x1="16" y1="3.5" x2="16" y2="6" />
+              <line x1="16" y1="26" x2="16" y2="28.5" />
+              <line x1="3.5" y1="16" x2="6" y2="16" />
+              <line x1="26" y1="16" x2="28.5" y2="16" />
+              <line x1="7.2" y1="7.2" x2="9" y2="9" />
+              <line x1="23" y1="23" x2="24.8" y2="24.8" />
+              <line x1="24.8" y1="7.2" x2="23" y2="9" />
+              <line x1="9" y1="23" x2="7.2" y2="24.8" />
+            </g>
+          </svg>
+        </span>
+        <div class="clock-time-wrap">
+          <span id="valley-time-digits" class="clock-digits">1:20</span>
+          <span id="valley-time-ampm" class="clock-ampm">PM</span>
+        </div>
+      </div>
+
+      <!-- Signature Argon Valley white underline bar with subtle tick -->
+      <div class="clock-underline">
+        <span class="clock-underline-notch"></span>
+      </div>
+
+      <div class="clock-bottom-row">
+        <span id="valley-date-text" class="clock-date">October 6</span>
+        <span id="valley-day-pill" class="clock-day-badge">Tue.</span>
+      </div>
+
+      <div class="controls-guide-pill">
+        <span><b>WASD / Click</b> Walk</span>
+        <span>•</span>
+        <span><b>Shift</b> Run</span>
+        <span>•</span>
+        <span><b>Space</b> Use Tool / Shake</span>
+        <span>•</span>
+        <span><b>E</b> Talk / Sit / Craft</span>
+      </div>
+    </div>
+
+    <!-- Center-Bottom Creamy Argon Valley Villager Dialogue Bubble with Interactive Choices -->
+    <div id="valley-dialogue-box" class="valley-dialogue-container hidden" role="dialog" aria-live="polite">
+      <div id="dialogue-speaker-tag" class="dialogue-speaker-badge" style="--speaker-bg: #f49342; --speaker-fg: #fffdf4;">
+        <span id="dialogue-speaker-name">Barnaby</span>
+      </div>
+      <div class="dialogue-pillow">
+        <div class="dialogue-content-col">
+          <p id="dialogue-text" class="dialogue-text">
+            Hammie! Nothing beats watering the tulips while the golden breeze rolls across the island, <span class="dialogue-highlight">li'l bucko</span>!
+          </p>
+          <div id="dialogue-choices" class="dialogue-choices-row">
+            <button type="button" class="dialogue-choice-btn" data-choice="chat_more">💬 Chat more!</button>
+            <button type="button" class="dialogue-choice-btn gift-btn" data-choice="gift_fruit">🍎 Gift a Fruit (+300 Coins)</button>
+            <button type="button" class="dialogue-choice-btn close-btn" data-choice="close">👋 See ya!</button>
+          </div>
+        </div>
+        <button id="dialogue-next-btn" class="dialogue-continue-arrow" aria-label="Next dialogue">
+          <svg viewBox="0 0 24 16" width="22" height="15">
+            <path d="M3 3 L12 13 L21 3 Z" fill="#f5a623" stroke="#d4830c" stroke-width="2" stroke-linejoin="round" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Bottom-Right Tactile Tool & Action Wheel Bubbles -->
+    <nav id="valley-tool-dock" class="valley-tool-dock" aria-label="Tools and Character Actions">
+      <button class="tool-bubble active" data-tool="watering_can" title="Key 1: Equip Watering Can (Press Space near flowers)">
+        <span class="tool-key-badge">1</span>
+        <span class="tool-emoji" aria-hidden="true">🚿</span>
+        <span class="tool-label">Watering Can</span>
+      </button>
+      <button class="tool-bubble" data-tool="shovel" title="Key 2: Equip Shovel (Press Space to dig holes &amp; Coin pouches)">
+        <span class="tool-key-badge">2</span>
+        <span class="tool-emoji" aria-hidden="true">⛏️</span>
+        <span class="tool-label">Shovel</span>
+      </button>
+      <button class="tool-bubble" data-tool="trowel" title="Key 3: Equip Path Trowel (Press Space to place/clear dirt path)">
+        <span class="tool-key-badge">3</span>
+        <span class="tool-emoji" aria-hidden="true">🧱</span>
+        <span class="tool-label">Path Trowel</span>
+      </button>
+      <button class="tool-bubble" data-tool="fishing_rod" title="Key 4: Equip Fishing Rod (Press Space near River or Ocean)">
+        <span class="tool-key-badge">4</span>
+        <span class="tool-emoji" aria-hidden="true">🎣</span>
+        <span class="tool-label">Fishing Rod</span>
+      </button>
+      <button class="tool-bubble" data-tool="bug_net" title="Key 5: Equip Bug Net (Press Space near Butterflies or Dragonfly)">
+        <span class="tool-key-badge">5</span>
+        <span class="tool-emoji" aria-hidden="true">🦋</span>
+        <span class="tool-label">Bug Net</span>
+      </button>
+      <button class="tool-bubble action-bubble" data-action="use_tool" title="Press Space: Use Equipped Tool / Shake Tree / Pick Up">
+        <span class="tool-emoji" aria-hidden="true">✨</span>
+        <span class="tool-label">Use / Shake [Space]</span>
+      </button>
+      <button class="tool-bubble action-bubble" data-action="sit_wave" title="Press E: Sit on Stump/Bench or Wave">
+        <span class="tool-emoji" aria-hidden="true">🪑</span>
+        <span class="tool-label">Sit / Wave [E]</span>
+      </button>
+      <button class="tool-bubble action-bubble" data-action="cycle_outfit" title="Press C or O: Switch Valley Outfit">
+        <span class="tool-emoji" aria-hidden="true">👕</span>
+        <span class="tool-label">Outfit [C]</span>
+      </button>
+      <button class="tool-bubble action-bubble" data-action="talk_villager" title="Press E or T: Chat with Nearest Villager">
+        <span class="tool-emoji" aria-hidden="true">💬</span>
+        <span class="tool-label">Chat [E]</span>
+      </button>
+      <button id="btn-audio-toggle" class="tool-bubble audio-bubble" data-action="audio_toggle" title="Press M: Toggle Lyria 3 Island Music &amp; Ambience">
+        <span id="audio-emoji" class="tool-emoji" aria-hidden="true">🎵</span>
+        <span id="audio-label" class="tool-label">Island Audio</span>
+      </button>
+    </nav>
+  </div>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
