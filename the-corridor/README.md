@@ -1,6 +1,8 @@
 # The Corridor
 
 First-person psychological horror engine built in Three.js with custom 35mm surveillance post-processing shaders, physically based flashlight lighting, spatial audio, and 5 mutating corridor loops.
+> **Create games in AI Studio:** Try building your own 3D games with Argon at **[ai.studio/build](https://ai.studio/build)**.
+
 
 ![The Corridor](../docs/screenshots/the-corridor.png)
 
@@ -14,3 +16,7 @@ First-person psychological horror engine built in Three.js with custom 35mm surv
 python3 server.py --port 8085
 ```
 Then open `http://localhost:8085` in your browser.
+
+---
+
+**Create games in AI Studio:** [ai.studio/build](https://ai.studio/build)

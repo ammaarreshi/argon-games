@@ -1,6 +1,8 @@
 # Argon Valley
 
 Cozy 3D valley and island life simulation built in Three.js featuring a custom rolling-horizon vertex shader, fishing, bug catching, gardening, crafting, and villager conversations.
+> **Create games in AI Studio:** Try building your own 3D games with Argon at **[ai.studio/build](https://ai.studio/build)**.
+
 
 ![Argon Valley](../docs/screenshots/argon-valley.png)
 
@@ -14,3 +16,7 @@ Cozy 3D valley and island life simulation built in Three.js featuring a custom r
 python3 server.py --port 8083
 ```
 Then open `http://localhost:8083` in your browser.
+
+---
+
+**Create games in AI Studio:** [ai.studio/build](https://ai.studio/build)

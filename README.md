@@ -1,6 +1,8 @@
 # Argon games
 
-Six 3D web games built with Three.js, custom GLSL shaders, spatial Web Audio, and procedural AI voice and music pipelines. Every game runs directly in the browser with zero external engine dependencies.
+Six 3D web games built with **Argon** using Three.js, custom GLSL shaders, spatial Web Audio, and procedural AI voice and music pipelines. Every game runs directly in the browser with zero external engine dependencies.
+
+> **Create games in AI Studio:** Want to build your own 3D games with Argon? Try it yourself at **[ai.studio/build](https://ai.studio/build)**.
 
 ---
 
@@ -152,3 +154,9 @@ Then open any game in your browser:
 - `http://localhost:8000/argon-valley/`
 - `http://localhost:8000/argon-towers/`
 - `http://localhost:8000/the-corridor/`
+
+---
+
+## Create games in AI Studio
+
+Ready to build your own games with Argon? Start creating at **[ai.studio/build](https://ai.studio/build)**.

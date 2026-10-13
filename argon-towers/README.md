@@ -1,6 +1,8 @@
 # Argon Towers
 
 2.5D tactical mazing tower defense built in Three.js where every turret placement dynamically recalculates A* enemy paths across an open 18×10 battlefield.
+> **Create games in AI Studio:** Try building your own 3D games with Argon at **[ai.studio/build](https://ai.studio/build)**.
+
 
 ![Argon Towers](../docs/screenshots/argon-towers.png)
 
@@ -14,3 +16,7 @@
 python3 -m http.server 8084
 ```
 Then open `http://localhost:8084` in your browser.
+
+---
+
+**Create games in AI Studio:** [ai.studio/build](https://ai.studio/build)

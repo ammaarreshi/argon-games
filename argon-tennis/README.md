@@ -1,6 +1,8 @@
 # Argon Tennis
 
 High-speed 3D arcade tennis built in Three.js with wrist-whip racket kinematics, expressive 3D characters, phone gyro motion controls, webcam hand tracking, and 1v1 multiplayer.
+> **Create games in AI Studio:** Try building your own 3D games with Argon at **[ai.studio/build](https://ai.studio/build)**.
+
 
 ![Argon Tennis](../docs/screenshots/argon-tennis.png)
 
@@ -14,3 +16,7 @@ High-speed 3D arcade tennis built in Three.js with wrist-whip racket kinematics,
 python3 server.py --port 8080
 ```
 Then open `http://localhost:8080` in your browser.
+
+---
+
+**Create games in AI Studio:** [ai.studio/build](https://ai.studio/build)
