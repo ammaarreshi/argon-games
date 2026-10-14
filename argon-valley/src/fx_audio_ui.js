@@ -113,7 +113,7 @@ export class CozyPostProcessor {
       tColor: { value: this.renderTarget.texture },
       tDepth: { value: this.depthTexture },
       uResolution: { value: new THREE.Vector2(rtWidth, rtHeight) },
-      uNear: { value: this.camera?.near || 0.1 },
+      uNear: { value: this.camera?.near || 0.5 },
       uFar: { value: this.camera?.far || 450.0 },
       uTime: { value: 0.0 },
       uSSAOStrength: { value: 0.44 },

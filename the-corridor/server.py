@@ -157,8 +157,8 @@ def main():
 
   server = ReuseThreadingHTTPServer((args.host, args.port), PTHorrorRequestHandler)
   print(
-      f"[The Corridor Horror Server] Serving {ROOT_DIR} on http://{args.host}:{args.port} "
-            flush=True,
+      f"[The Corridor Horror Server] Serving {ROOT_DIR} on http://{args.host}:{args.port} ",
+      flush=True,
   )
   try:
     server.serve_forever()

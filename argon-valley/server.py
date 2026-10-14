@@ -157,8 +157,8 @@ def main():
 
   server = ReuseThreadingHTTPServer((args.host, args.port), CozyIslandRequestHandler)
   print(
-      f"[Argon Valley Server] Serving {ROOT_DIR} on http://{args.host}:{args.port} "
-            flush=True,
+      f"[Argon Valley Server] Serving {ROOT_DIR} on http://{args.host}:{args.port} ",
+      flush=True,
   )
   try:
     server.serve_forever()

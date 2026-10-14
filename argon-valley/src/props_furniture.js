@@ -143,7 +143,7 @@ export class PropsAndFurnitureBuilder {
     // SECTOR 1: Cozy Player Cottage Yard (ref_02_house_yard.png)
     // -------------------------------------------------------------------------
     this._buildPlayerCottage(-5.8, -9.8, this.cottageYardGroup);
-    this._buildRedMailbox(-3.9, -8.4, this.cottageYardGroup);
+    this._buildRedMailbox(-3.45, -8.25, this.cottageYardGroup);
     this._buildSteelDrumBoiler(-2.2, -9.4, this.cottageYardGroup);
     this._buildWoodenSwingBench(0.8, -9.2, 0.0, 'swing_yard', this.cottageYardGroup);
     this._buildLogBenchWithCoffee(-1.85, -7.85, 0.0, this.cottageYardGroup);
@@ -758,68 +758,69 @@ export class PropsAndFurnitureBuilder {
     gableShape.lineTo(0, 1.48);
     gableShape.closePath();
 
+    const gableDepth = wallD - 0.16;
     const gableGeo = new THREE.ExtrudeGeometry(gableShape, {
-      depth: wallD - 0.1,
+      depth: gableDepth,
       bevelEnabled: true,
       bevelSegments: 2,
       steps: 1,
-      bevelSize: 0.04,
-      bevelThickness: 0.04,
+      bevelSize: 0.03,
+      bevelThickness: 0.03,
     });
-    gableGeo.translate(0, 0, -(wallD - 0.1) * 0.5);
+    gableGeo.translate(0, 0, -gableDepth * 0.5);
     gableGeo.computeVertexNormals();
     const gableMesh = new THREE.Mesh(gableGeo, this._materials.cottageStucco);
-    gableMesh.position.set(0, 0.36 + wallH - 0.04, 0);
+    gableMesh.position.set(0, 0.36 + wallH, 0);
     group.add(gableMesh);
 
-    // Subtle warm stone corner quoins along front corners (visible in ref_02)
+    // Subtle warm stone corner quoins along front corners (positioned cleanly inward of corner posts and proud of stucco wall)
     for (const side of [-1, 1]) {
       for (let i = 0; i < 4; i++) {
-        const qW = i % 2 === 0 ? 0.38 : 0.26;
-        const quoinGeo = createRoundedBoxGeometry(qW, 0.24, 0.16, 0.03, 2);
+        const qW = i % 2 === 0 ? 0.36 : 0.25;
+        const quoinGeo = createRoundedBoxGeometry(qW, 0.24, 0.12, 0.025, 2);
         const quoin = new THREE.Mesh(quoinGeo, this._materials.cottageQuoin);
         quoin.position.set(
-          side * (wallW * 0.5 - qW * 0.5 - 0.12),
+          side * (wallW * 0.5 - qW * 0.5 - 0.22),
           0.68 + i * 0.38,
-          wallD * 0.5 - 0.03
+          wallD * 0.5 - 0.01
         );
         group.add(quoin);
       }
     }
 
-    // 3. Warm caramel timber framing beams (#b87442)
-    const sillBeamGeo = createRoundedBoxGeometry(wallW + 0.1, 0.18, wallD + 0.1, 0.035, 2);
+    // 3. Warm caramel timber framing beams (#b87442) — staggered Z planes to prevent any coplanar z-fighting
+    const sillBeamGeo = createRoundedBoxGeometry(wallW + 0.08, 0.18, wallD + 0.08, 0.035, 2);
     const sillBeam = new THREE.Mesh(sillBeamGeo, this._materials.timberWood);
     sillBeam.position.set(0, 0.46, 0);
     group.add(sillBeam);
 
-    const cornerPostGeo = createRoundedBoxGeometry(0.2, wallH + 0.08, 0.2, 0.04, 2);
+    const cornerPostGeo = createRoundedBoxGeometry(0.22, wallH + 0.08, 0.22, 0.04, 2);
     for (const sx of [-1, 1]) {
       for (const sz of [-1, 1]) {
         const post = new THREE.Mesh(cornerPostGeo, this._materials.timberWood);
-        post.position.set(sx * (wallW * 0.5 - 0.05), 0.36 + wallH * 0.5, sz * (wallD * 0.5 - 0.05));
+        post.position.set(sx * (wallW * 0.5 - 0.02), 0.36 + wallH * 0.5, sz * (wallD * 0.5 - 0.02));
         group.add(post);
       }
     }
 
     const roofAngle = Math.atan2(1.52, wallW * 0.5 + 0.25);
     for (const side of [-1, 1]) {
-      const rakeBeamGeo = createRoundedBoxGeometry(2.55, 0.16, 0.18, 0.035, 2);
+      const rakeBeamGeo = createRoundedBoxGeometry(2.55, 0.16, 0.16, 0.035, 2);
       const rakeBeam = new THREE.Mesh(rakeBeamGeo, this._materials.timberWood);
-      rakeBeam.position.set(side * 1.02, 2.98, wallD * 0.5 + 0.02);
+      rakeBeam.position.set(side * 1.02, 2.98, wallD * 0.5 + 0.05 + (side > 0 ? 0.008 : 0.0));
       rakeBeam.rotation.z = -side * roofAngle;
       group.add(rakeBeam);
 
-      const braceGeo = createRoundedBoxGeometry(0.85, 0.14, 0.15, 0.03, 2);
+      const braceGeo = createRoundedBoxGeometry(0.85, 0.14, 0.14, 0.03, 2);
       const brace = new THREE.Mesh(braceGeo, this._materials.timberWood);
-      brace.position.set(side * 0.42, 2.96, wallD * 0.5 + 0.01);
+      brace.position.set(side * 0.42, 2.96, wallD * 0.5 + 0.015);
       brace.rotation.z = side * 0.68;
       group.add(brace);
     }
 
-    const kingPostGeo = createRoundedBoxGeometry(0.16, 0.95, 0.16, 0.03, 2);
+    const kingPostGeo = createRoundedBoxGeometry(0.16, 0.95, 0.18, 0.03, 2);
     const kingPost = new THREE.Mesh(kingPostGeo, this._materials.timberWood);
-    kingPost.position.set(0, 3.28, wallD * 0.5 + 0.01);
+    kingPost.position.set(0, 3.28, wallD * 0.5 + 0.085);
     group.add(kingPost);
 
     // 4. Steep pitched gable roof with overlapping rows of rounded terracotta roof tiles (#d84438)
@@ -893,36 +894,52 @@ export class PropsAndFurnitureBuilder {
     chimneyGroup.add(chimneyPot);
     group.add(chimneyGroup);
 
-    // 5. Iconic Rounded-Arch Red Wooden Front Door (#d64c3b) inside curved timber arch frame
+    // 5. Iconic Rounded-Arch Red Wooden Front Door (#d64c3b) inside hollow curved timber arch frame
+    //    (Hollow arch cutout + stepped Z planes eliminate any coplanar z-fighting between arch, slab, trim, and glass)
     const doorGroup = new THREE.Group();
     doorGroup.position.set(0, 0.36, wallD * 0.5 + 0.02);
     group.add(doorGroup);
 
-    const createArchShape = (w, rectH, archR) => {
+    const createArchShape = (w, rectH, archR, innerHole = null) => {
       const s = new THREE.Shape();
       s.moveTo(-w * 0.5, 0);
       s.lineTo(w * 0.5, 0);
       s.lineTo(w * 0.5, rectH);
       s.absarc(0, rectH, archR, 0, Math.PI, false);
       s.lineTo(-w * 0.5, 0);
+      if (innerHole) {
+        const hw = innerHole.w * 0.5;
+        const hole = new THREE.Path();
+        hole.moveTo(-hw, 0.02);
+        hole.lineTo(-hw, innerHole.rectH);
+        hole.absarc(0, innerHole.rectH, innerHole.archR, Math.PI, 0, true);
+        hole.lineTo(hw, 0.02);
+        hole.lineTo(-hw, 0.02);
+        s.holes.push(hole);
+      }
       return s;
     };
 
-    const outerArchGeo = new THREE.ExtrudeGeometry(createArchShape(1.56, 1.38, 0.78), {
-      depth: 0.18,
-      bevelEnabled: true,
-      bevelSegments: 3,
-      steps: 1,
-      bevelSize: 0.04,
-      bevelThickness: 0.04,
-      curveSegments: 24,
-    });
+    // Hollow timber arch frame: front face at z = -0.04 + 0.14 + 0.035 = +0.135 (and hollow behind the door slab)
+    const outerArchGeo = new THREE.ExtrudeGeometry(
+      createArchShape(1.56, 1.38, 0.78, { w: 1.16, rectH: 1.30, archR: 0.58 }),
+      {
+        depth: 0.14,
+        bevelEnabled: true,
+        bevelSegments: 3,
+        steps: 1,
+        bevelSize: 0.035,
+        bevelThickness: 0.035,
+        curveSegments: 24,
+      }
+    );
     const outerArch = new THREE.Mesh(outerArchGeo, this._materials.timberWood);
-    outerArch.position.set(0, 0, -0.06);
+    outerArch.position.set(0, 0, -0.04);
     doorGroup.add(outerArch);
 
+    // Red wooden door slab: back at z = +0.02, front face at z = 0.05 + 0.12 + 0.03 = +0.200 (6.5cm proud of outerArch)
     const doorSlabGeo = new THREE.ExtrudeGeometry(createArchShape(1.24, 1.32, 0.62), {
-      depth: 0.11,
+      depth: 0.12,
       bevelEnabled: true,
       bevelSegments: 3,
       steps: 1,
@@ -931,15 +948,16 @@ export class PropsAndFurnitureBuilder {
       curveSegments: 24,
     });
     const doorSlab = new THREE.Mesh(doorSlabGeo, this._materials.cottageDoorRed);
-    doorSlab.position.set(0, 0.02, 0.02);
+    doorSlab.position.set(0, 0.02, 0.05);
     doorGroup.add(doorSlab);
 
-    const panelFrameGeo = createRoundedBoxGeometry(0.86, 0.56, 0.06, 0.025, 2);
+    // Lower door raised panel: back at z = +0.205, front face at z = +0.245 (4.5cm proud of doorSlab)
+    const panelFrameGeo = createRoundedBoxGeometry(0.86, 0.56, 0.04, 0.018, 2);
     const panelFrame = new THREE.Mesh(panelFrameGeo, this._materials.cottageDoorRed);
-    panelFrame.position.set(0, 0.52, 0.16);
+    panelFrame.position.set(0, 0.52, 0.225);
     doorGroup.add(panelFrame);
 
-    // 4-pane arched/circular glass window inside upper door (positioned clearly proud of door slab)
+    // 4-pane arched/circular glass window inside upper door: front face at z = 0.205 + 0.03 + 0.012 = +0.247
     const windowGlassMat = new THREE.MeshPhysicalMaterial({
       color: 0x3b2c28,
       emissive: new THREE.Color(0xffb84d),
@@ -950,31 +968,31 @@ export class PropsAndFurnitureBuilder {
     this.cottageGlowMaterials.push(windowGlassMat);
 
     const winArchGeo = new THREE.ExtrudeGeometry(createArchShape(0.68, 0.34, 0.34), {
-      depth: 0.05,
+      depth: 0.03,
       bevelEnabled: true,
       bevelSegments: 2,
       steps: 1,
-      bevelSize: 0.015,
-      bevelThickness: 0.015,
+      bevelSize: 0.012,
+      bevelThickness: 0.012,
       curveSegments: 18,
     });
     const winGlass = new THREE.Mesh(winArchGeo, windowGlassMat);
-    winGlass.position.set(0, 1.12, 0.17);
+    winGlass.position.set(0, 1.12, 0.205);
     doorGroup.add(winGlass);
 
-    // 4-pane window muntin crossbars (+)
+    // 4-pane window muntin crossbars (+) — staggered in Z so vBar and hBar never z-fight at their intersection
     const vBar = new THREE.Mesh(
-      createRoundedBoxGeometry(0.068, 0.68, 0.06, 0.015, 2),
+      createRoundedBoxGeometry(0.068, 0.68, 0.036, 0.012, 2),
       this._materials.cottageDoorRed
     );
-    vBar.position.set(0, 1.45, 0.22);
+    vBar.position.set(0, 1.45, 0.262);
     doorGroup.add(vBar);
 
     const hBar = new THREE.Mesh(
-      createRoundedBoxGeometry(0.68, 0.068, 0.06, 0.015, 2),
+      createRoundedBoxGeometry(0.68, 0.068, 0.042, 0.012, 2),
       this._materials.cottageDoorRed
     );
-    hBar.position.set(0, 1.43, 0.22);
+    hBar.position.set(0, 1.43, 0.266);
     doorGroup.add(hBar);
 
     // Round brass doorknob on the left (matching ref_02)
@@ -983,37 +1001,37 @@ export class PropsAndFurnitureBuilder {
       this._materials.brass
     );
     knobBase.rotation.x = Math.PI / 2;
-    knobBase.position.set(-0.44, 0.96, 0.18);
+    knobBase.position.set(-0.44, 0.96, 0.22);
     doorGroup.add(knobBase);
 
     const knobBall = new THREE.Mesh(new THREE.SphereGeometry(0.078, 16, 14), this._materials.brass);
-    knobBall.position.set(-0.44, 0.96, 0.24);
+    knobBall.position.set(-0.44, 0.96, 0.275);
     doorGroup.add(knobBall);
 
     // Warm side windows on left & right cottage walls
     for (const side of [-1, 1]) {
       const sideWinGroup = new THREE.Group();
-      sideWinGroup.position.set(side * (wallW * 0.5 + 0.02), 1.48, 0);
+      sideWinGroup.position.set(side * (wallW * 0.5 + 0.03), 1.48, 0);
       sideWinGroup.rotation.y = side * (Math.PI / 2);
 
       const frame = new THREE.Mesh(
-        createRoundedBoxGeometry(0.86, 0.86, 0.1, 0.03, 2),
+        createRoundedBoxGeometry(0.86, 0.86, 0.09, 0.03, 2),
         this._materials.timberWood
       );
       sideWinGroup.add(frame);
 
       const glass = new THREE.Mesh(
-        createRoundedBoxGeometry(0.68, 0.68, 0.06, 0.02, 2),
+        createRoundedBoxGeometry(0.68, 0.68, 0.05, 0.018, 2),
         windowGlassMat
       );
-      glass.position.z = 0.03;
+      glass.position.z = 0.055;
       sideWinGroup.add(glass);
 
       const sill = new THREE.Mesh(
         createRoundedBoxGeometry(0.98, 0.1, 0.18, 0.025, 2),
         this._materials.timberWood
       );
-      sill.position.set(0, -0.44, 0.04);
+      sill.position.set(0, -0.45, 0.055);
       sideWinGroup.add(sill);
 
       group.add(sideWinGroup);
@@ -1088,7 +1106,7 @@ export class PropsAndFurnitureBuilder {
     boxLower.position.set(0, 0.94, 0);
     group.add(boxLower);
 
-    const boxVaultGeo = new THREE.CylinderGeometry(0.23, 0.23, 0.58, 16);
+    const boxVaultGeo = new THREE.CylinderGeometry(0.228, 0.228, 0.56, 16);
     boxVaultGeo.rotateX(Math.PI / 2);
     const boxVault = new THREE.Mesh(boxVaultGeo, this._materials.mailboxRed);
     boxVault.position.set(0, 1.06, 0);
@@ -1098,12 +1116,12 @@ export class PropsAndFurnitureBuilder {
       createRoundedBoxGeometry(0.36, 0.07, 0.08, 0.02, 2),
       this._materials.mailboxRed
     );
-    hood.position.set(0, 1.05, 0.29);
+    hood.position.set(0, 1.05, 0.305);
     group.add(hood);
 
     const slotMat = new THREE.MeshPhysicalMaterial({ color: 0x3b1210, roughness: 0.8 });
     const slot = new THREE.Mesh(createRoundedBoxGeometry(0.3, 0.04, 0.04, 0.01, 2), slotMat);
-    slot.position.set(0, 1.01, 0.28);
+    slot.position.set(0, 1.01, 0.312);
     group.add(slot);
 
     const flagPivot = new THREE.Group();
@@ -1262,14 +1280,14 @@ export class PropsAndFurnitureBuilder {
 
     const doorFlapGeo = createRoundedBoxGeometry(1.18, 1.68, 0.08, 0.025, 2);
     const doorFlap = new THREE.Mesh(doorFlapGeo, tentFlapMat);
-    doorFlap.position.set(0, 0.89, tentD * 0.5 + 0.03);
+    doorFlap.position.set(0, 0.89, tentD * 0.5 + 0.065);
     group.add(doorFlap);
 
     const doorSeam = new THREE.Mesh(
       createRoundedBoxGeometry(0.035, 1.66, 0.095, 0.01, 2),
       tentFrontMat
     );
-    doorSeam.position.set(0, 0.89, tentD * 0.5 + 0.04);
+    doorSeam.position.set(0, 0.89, tentD * 0.5 + 0.10);
     group.add(doorSeam);
 
     const ridgePoleGeo = new THREE.CylinderGeometry(0.055, 0.055, tentD + 0.34, 12);
@@ -3083,27 +3101,27 @@ export class PropsAndFurnitureBuilder {
       createRoundedBoxGeometry(0.28, 0.22, 0.02, 0.012, 2),
       darkGrilleMat
     );
-    grille.position.set(-0.08, rH * 0.5 + 0.005, rD * 0.5 + 0.005);
+    grille.position.set(-0.08, rH * 0.5 + 0.005, rD * 0.5 + 0.018);
     group.add(grille);
 
     const tunerWindow = new THREE.Mesh(
       createRoundedBoxGeometry(0.045, 0.2, 0.02, 0.006, 2),
       darkGrilleMat
     );
-    tunerWindow.position.set(0.11, rH * 0.5 + 0.005, rD * 0.5 + 0.005);
+    tunerWindow.position.set(0.11, rH * 0.5 + 0.005, rD * 0.5 + 0.018);
     group.add(tunerWindow);
 
     const redNeedle = new THREE.Mesh(
       createRoundedBoxGeometry(0.038, 0.025, 0.024, 0.004, 2),
       this._materials.mailboxRed
     );
-    redNeedle.position.set(0.11, rH * 0.5 + 0.04, rD * 0.5 + 0.008);
+    redNeedle.position.set(0.11, rH * 0.5 + 0.04, rD * 0.5 + 0.032);
     group.add(redNeedle);
 
     for (const ky of [0.12, 0.22]) {
       const knob = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, 0.03, 12), darkGrilleMat);
       knob.rotation.x = Math.PI / 2;
-      knob.position.set(0.19, ky, rD * 0.5 + 0.01);
+      knob.position.set(0.19, ky, rD * 0.5 + 0.022);
       group.add(knob);
     }
 

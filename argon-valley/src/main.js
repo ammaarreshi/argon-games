@@ -82,10 +82,10 @@ class CozyIslandApp {
     this.renderer.toneMapping = THREE.NoToneMapping; // Handled in CozyPostProcessor
     this.container.appendChild(this.renderer.domElement);
 
-    // 2. Scene & Camera
+    // 2. Scene & Camera (near=0.5 maximizes hardware depth buffer precision)
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color('#80d4ff');
-    this.camera = new THREE.PerspectiveCamera(33, this.width / this.height, 0.25, 450);
+    this.camera = new THREE.PerspectiveCamera(33, this.width / this.height, 0.5, 450);
 
     // 3. Engine & World Curve Subsystems (Agent 1)
     this.gridSystem = new IslandGridSystem();

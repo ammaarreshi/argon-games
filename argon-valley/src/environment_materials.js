@@ -1754,7 +1754,7 @@ export class EnvironmentBuilder {
     const flatLawnGeo = new THREE.PlaneGeometry(72, 34, 144, 68);
     flatLawnGeo.rotateX(-Math.PI / 2);
     this.flatLawnCoverMesh = new THREE.Mesh(flatLawnGeo, grassMat);
-    this.flatLawnCoverMesh.position.set(0, 0.602, -6.5);
+    this.flatLawnCoverMesh.position.set(0, 0.6, -6.5);
     this.flatLawnCoverMesh.receiveShadow = true;
     this.flatLawnCoverMesh.visible = false;
     this.terrainGroup.add(this.flatLawnCoverMesh);
@@ -3957,7 +3957,8 @@ export class EnvironmentBuilder {
 
     // 2. Main Grass Plateau vs Uninterrupted Flat Lawn vs Beach Sunset Peninsula
     if (this.mainGrassMesh) {
-      this.mainGrassMesh.visible = preset !== 'beach_sunset';
+      this.mainGrassMesh.visible =
+        preset !== 'beach_sunset' && preset !== 'house_yard' && preset !== 'tent_horizon';
     }
     if (this.flatLawnCoverMesh) {
       this.flatLawnCoverMesh.visible = preset === 'house_yard' || preset === 'tent_horizon';
